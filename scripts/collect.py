@@ -21,9 +21,9 @@ MARKETS = {"AE": "UAE", "SA": "KSA", "KW": "Kuwait", "QA": "Qatar"}
 
 # NewsAPI geo-filter terms per market
 MARKET_NEWS_TERMS = {
-    "UAE":    "UAE OR Dubai OR "Abu Dhabi" OR Emirates",
-    "KSA":    ""Saudi Arabia" OR Riyadh OR Jeddah OR KSA",
-    "Kuwait": "Kuwait OR "Kuwait City"",
+    "UAE":    "UAE OR Dubai OR Abu Dhabi OR Emirates",
+    "KSA":    "Saudi Arabia OR Riyadh OR Jeddah OR KSA",
+    "Kuwait": "Kuwait",
     "Qatar":  "Qatar OR Doha",
 }
 SPORT_KW  = ["football","soccer","game","match","vs","ucl","league","cup","sport",
