@@ -628,12 +628,6 @@ if __name__ == "__main__":
         else:
             raise
 
-    # Generate AI summaries (server-side, no CORS issues)
-    if signals:
-        summaries = generate_all_summaries(data, config)
-        if summaries:
-            data["summaries"] = summaries
-
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT_PATH.write_text(json.dumps(data, indent=2))
     log.info(f"📄 pulse_data.json written")
