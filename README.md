@@ -2,7 +2,7 @@
 
 **Real-time consumer signal dashboard for MENA markets.**
 
-Built for GroupM MENA crisis reporting. Monitors behavioral and media signals across UAE, KSA, Kuwait, and Qatar — refreshed daily, zero infrastructure cost.
+Built for WPP MENA crisis reporting. Monitors behavioral and media signals across UAE, KSA, Kuwait, and Qatar — refreshed daily, zero infrastructure cost.
 
 ---
 
@@ -149,4 +149,4 @@ The dashboard reads from `/pulse_data.json` at page load. Re-run the collector a
 
 ## License
 
-Internal tool — GroupM MENA. Not for public redistribution.
+Internal tool — WPP MENA. Not for public redistribution.
