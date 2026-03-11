@@ -3,7 +3,7 @@ name: Daily Pulse Refresh
 on:
   schedule:
     - cron: '0 5 * * *'   # 05:00 UTC = 09:00 GST daily
-  workflow_dispatch:        # allow manual trigger from GitHub UI
+  workflow_dispatch:
 
 jobs:
   collect:
@@ -21,7 +21,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install pytrends pandas requests python-dotenv
+        run: pip install requests python-dotenv
 
       - name: Run collector
         env:
@@ -33,10 +33,8 @@ jobs:
 
       - name: Commit and push data
         run: |
-          git config user.name  "github-actions[bot]"
+          git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add public/pulse_data.json
-          git diff --staged --quiet || (
-            git commit -m "chore: daily pulse refresh $(date -u '+%Y-%m-%d %H:%M UTC')"
-            git push
-          )
+          git add public/pulse_data.json public/pulse_history.json
+          git commit -m "chore: daily pulse refresh" || echo "Nothing to commit"
+          git push

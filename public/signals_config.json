@@ -1,0 +1,257 @@
+{
+  "ramadan_active": true,
+  "ramadan_end": "2026-03-30",
+  "categories": {
+    "escapism": {
+      "label": "Escapism & Entertainment",
+      "icon": "◈",
+      "color": "#00f5d4",
+      "hypothesis": "Stress drives people toward distraction and comfort content",
+      "signals": {
+        "gaming": {
+          "label": "Gaming",
+          "wiki": "Gaming",
+          "news": "gaming esports video games",
+          "guardian": "gaming"
+        },
+        "streaming": {
+          "label": "Streaming",
+          "wiki": "Streaming_media",
+          "news": "netflix streaming video content",
+          "guardian": "streaming"
+        },
+        "humour": {
+          "label": "Humour & Comedy",
+          "wiki": "Comedy",
+          "news": "comedy memes humour viral",
+          "guardian": "comedy"
+        },
+        "beauty": {
+          "label": "Beauty & Self-care",
+          "wiki": "Skin_care",
+          "news": "beauty skincare self-care wellness routine",
+          "guardian": "beauty"
+        }
+      }
+    },
+    "crisis_awareness": {
+      "label": "News & Crisis Awareness",
+      "icon": "◎",
+      "color": "#f72585",
+      "hypothesis": "Crisis triggers spike in news consumption and information seeking",
+      "signals": {
+        "breaking_news": {
+          "label": "Breaking News",
+          "wiki": "Breaking_news",
+          "news": "breaking news latest update",
+          "guardian": "news"
+        },
+        "crisis_topics": {
+          "label": "Crisis Topics",
+          "wiki": "Crisis",
+          "news": "crisis emergency alert",
+          "guardian": "crisis"
+        },
+        "war_news": {
+          "label": "War & Conflict",
+          "wiki": "War",
+          "news": "war conflict military attack",
+          "guardian": "war"
+        },
+        "flight_searches": {
+          "label": "Flight Searches",
+          "wiki": "Airline",
+          "news": "flights tickets travel booking",
+          "guardian": "airlines travel"
+        },
+        "fact_checking": {
+          "label": "Fact-checking",
+          "wiki": "Fact-checking",
+          "news": "fact check misinformation rumour",
+          "guardian": "fact check"
+        },
+        "social_news": {
+          "label": "Social Media News",
+          "wiki": "Social_media",
+          "news": "social media trending viral news",
+          "guardian": "social media"
+        }
+      }
+    },
+    "economic_anxiety": {
+      "label": "Economic Anxiety",
+      "icon": "◇",
+      "color": "#fb8500",
+      "hypothesis": "Financial stress changes search and purchase intent signals",
+      "signals": {
+        "price_comparison": {
+          "label": "Price Comparison",
+          "wiki": "Price_comparison_service",
+          "news": "price comparison cheapest best deal",
+          "guardian": "prices consumer"
+        },
+        "discounts": {
+          "label": "Discounts & Coupons",
+          "wiki": "Discounts_and_allowances",
+          "news": "discount coupon sale offer promo",
+          "guardian": "discounts retail"
+        },
+        "budgeting": {
+          "label": "Budgeting & Savings",
+          "wiki": "Personal_finance",
+          "news": "budgeting savings personal finance",
+          "guardian": "personal finance"
+        },
+        "inflation": {
+          "label": "Inflation",
+          "wiki": "Inflation",
+          "news": "inflation prices cost of living rise",
+          "guardian": "inflation"
+        },
+        "panic_buying": {
+          "label": "Panic Buying",
+          "wiki": "Panic_buying",
+          "news": "panic buying stockpiling shortage supply",
+          "guardian": "panic buying"
+        },
+        "panic_selling": {
+          "label": "Panic Selling",
+          "wiki": "Market_crash",
+          "news": "panic selling market crash stocks sell-off",
+          "guardian": "market crash stocks"
+        }
+      }
+    },
+    "behavioral_shifts": {
+      "label": "Behavioral Shifts",
+      "icon": "◐",
+      "color": "#8338ec",
+      "hypothesis": "Crisis changes how people shop, move and spend time",
+      "signals": {
+        "food_delivery": {
+          "label": "Food Delivery",
+          "wiki": "Food_delivery",
+          "news": "food delivery order talabat deliveroo",
+          "guardian": "food delivery"
+        },
+        "online_shopping": {
+          "label": "Online Shopping",
+          "wiki": "Online_shopping",
+          "news": "online shopping ecommerce amazon noon",
+          "guardian": "ecommerce online shopping"
+        },
+        "home_improvement": {
+          "label": "Home & Nesting",
+          "wiki": "Home_improvement",
+          "news": "home improvement renovation interior decor",
+          "guardian": "home improvement"
+        },
+        "travel": {
+          "label": "Travel & Escape",
+          "wiki": "Tourism",
+          "news": "travel holiday vacation escape trip",
+          "guardian": "travel"
+        }
+      }
+    },
+    "wellness": {
+      "label": "Wellness & Mental Health",
+      "icon": "◉",
+      "color": "#06d6a0",
+      "hypothesis": "Prolonged stress surfaces as wellness and mental health interest",
+      "signals": {
+        "mental_health": {
+          "label": "Mental Health",
+          "wiki": "Mental_health",
+          "news": "mental health anxiety stress depression",
+          "guardian": "mental health"
+        },
+        "meditation": {
+          "label": "Meditation & Mindfulness",
+          "wiki": "Meditation",
+          "news": "meditation mindfulness calm stress relief",
+          "guardian": "meditation mindfulness"
+        },
+        "fitness": {
+          "label": "Fitness & Exercise",
+          "wiki": "Physical_fitness",
+          "news": "fitness exercise gym workout health",
+          "guardian": "fitness"
+        },
+        "sleep": {
+          "label": "Sleep",
+          "wiki": "Sleep",
+          "news": "sleep insomnia rest sleep disorder",
+          "guardian": "sleep health"
+        },
+        "therapy": {
+          "label": "Therapy & Counselling",
+          "wiki": "Psychotherapy",
+          "news": "therapy counselling psychiatrist mental support",
+          "guardian": "therapy counselling"
+        }
+      }
+    },
+    "social_community": {
+      "label": "Social & Community",
+      "icon": "◆",
+      "color": "#fee440",
+      "hypothesis": "Crisis drives community-seeking and prosocial behavior",
+      "signals": {
+        "charity": {
+          "label": "Charity & Donations",
+          "wiki": "Charitable_organization",
+          "news": "charity donation fund relief aid",
+          "guardian": "charity"
+        },
+        "volunteering": {
+          "label": "Volunteering",
+          "wiki": "Volunteering",
+          "news": "volunteer community help support",
+          "guardian": "volunteering"
+        },
+        "community": {
+          "label": "Community Events",
+          "wiki": "Community",
+          "news": "community event local gathering",
+          "guardian": "community"
+        }
+      }
+    },
+    "ramadan": {
+      "label": "Ramadan",
+      "icon": "☽",
+      "color": "#ffd166",
+      "hypothesis": "Ramadan shifts consumption patterns — iftar, late-night, Eid prep",
+      "ramadan_only": true,
+      "signals": {
+        "iftar_delivery": {
+          "label": "Iftar Delivery",
+          "wiki": "Iftar",
+          "news": "iftar delivery food ramadan break fast",
+          "guardian": "ramadan iftar"
+        },
+        "late_night": {
+          "label": "Late-night Entertainment",
+          "wiki": "Night_owl",
+          "news": "late night entertainment show streaming ramadan",
+          "guardian": "ramadan entertainment"
+        },
+        "eid_shopping": {
+          "label": "Eid Shopping",
+          "wiki": "Eid_al-Fitr",
+          "news": "eid shopping fashion clothes gifts",
+          "guardian": "eid"
+        },
+        "suhoor": {
+          "label": "Suhoor Food",
+          "wiki": "Suhoor",
+          "news": "suhoor food recipes ramadan morning meal",
+          "guardian": "suhoor ramadan"
+        }
+      }
+    }
+  },
+  "last_updated": "2026-03-11T00:00:00Z",
+  "updated_by": "default"
+}
