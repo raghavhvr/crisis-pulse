@@ -290,22 +290,32 @@ function ExecSummary({ activeMarket, categories, newsapiByMarket, guardian, rss,
   activeMarket:string; categories:any; newsapiByMarket:any; guardian:any;
   rss:any; history:any[]; isRamadan:boolean; fetched_at:string;
 }){
-  const [summary, setSummary] = useState<string>("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError]     = useState("");
-  const [lastMarket, setLastMarket] = useState("");
+  // Cache summaries per market for the session (keyed by market + fetched_at date)
+  const cacheRef  = useRef<Record<string,string>>({});
+  const loadingRef = useRef<Record<string,boolean>>({});
+  const [activeKey, setActiveKey] = useState("");
+  const [tick, setTick]           = useState(0); // force re-render when cache updates
   const abortRef = useRef<AbortController|null>(null);
+
+  const cacheKey = `${activeMarket}::${fetched_at?.slice(0,10)||""}`;
+  const summary  = cacheRef.current[cacheKey] || "";
+  const loading  = !!loadingRef.current[cacheKey];
+  const [error, setError] = useState("");
 
   useEffect(()=>{
     if(!activeMarket || !categories) return;
-    // Cancel previous request
+    setActiveKey(cacheKey);
+
+    // Already cached or in-flight — just show it
+    if(cacheRef.current[cacheKey] || loadingRef.current[cacheKey]) return;
+
+    // Mark as loading and kick off request
+    loadingRef.current[cacheKey] = true;
+    setError("");
+    setTick(t=>t+1);
+
     if(abortRef.current) abortRef.current.abort();
     abortRef.current = new AbortController();
-
-    setSummary("");
-    setError("");
-    setLoading(true);
-    setLastMarket(activeMarket);
 
     // Build signal snapshot for prompt
     const catKeys = Object.keys(categories);
@@ -410,7 +420,10 @@ Rules: Be direct, no fluff. Use signal names naturally. Maximum 180 words total.
           }
           // deepseek-r1 wraps output in <think>…</think> — strip it
           const delta = provider.parse(raw).replace(/<think>[\s\S]*?<\/think>/g,"").replace(/<think>[\s\S]*/,"");
-          if(delta) setSummary(prev=>prev+delta);
+          if(delta){
+            cacheRef.current[cacheKey] = (cacheRef.current[cacheKey]||"") + delta;
+            setTick(t=>t+1);
+          }
         }
       }
       return true;
@@ -420,21 +433,23 @@ Rules: Be direct, no fluff. Use signal names naturally. Maximum 180 words total.
       for(const provider of PROVIDERS){
         try{
           await streamFromProvider(provider);
-          setLoading(false);
+          loadingRef.current[cacheKey] = false;
+          setTick(t=>t+1);
           return;
         } catch(e:any){
           if(e.name==="AbortError") return;
           // 429 or error — try next provider
-          setSummary("");
+          // retry next provider
           continue;
         }
       }
-      setError("All free AI providers are busy. Try switching market or refreshing.");
-      setLoading(false);
+      setError("All free AI providers are busy. Refresh to retry.");
+      loadingRef.current[cacheKey] = false;
+      setTick(t=>t+1);
     })();
 
     return ()=>{ abortRef.current?.abort(); };
-  }, [activeMarket]);
+  }, [activeMarket, tick]);
 
   const flagMap:Record<string,string> = {UAE:"🇦🇪",KSA:"🇸🇦",Kuwait:"🇰🇼",Qatar:"🇶🇦"};
   const date = new Date(fetched_at).toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
@@ -467,7 +482,7 @@ Rules: Be direct, no fluff. Use signal names naturally. Maximum 180 words total.
             {flagMap[activeMarket]} {activeMarket} · {date}
           </span>
         </div>
-        <div style={{display:"flex",alignItems:"center",gap:6}}>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
           {loading && (
             <div style={{display:"flex",gap:3,alignItems:"center"}}>
               {[0,1,2].map(i=>(
@@ -479,6 +494,20 @@ Rules: Be direct, no fluff. Use signal names naturally. Maximum 180 words total.
               ))}
               <span style={{fontSize:10,color:"rgba(255,255,255,0.4)",marginLeft:4}}>Generating…</span>
             </div>
+          )}
+          {!loading && (
+            <button onClick={()=>{
+              delete cacheRef.current[cacheKey];
+              loadingRef.current[cacheKey] = false;
+              setTick(t=>t+1);
+            }} style={{
+              background:"none",border:"none",color:"rgba(255,255,255,0.25)",
+              fontSize:11,cursor:"pointer",padding:"2px 6px",borderRadius:3,
+              transition:"color .15s",
+            }}
+            onMouseEnter={e=>(e.currentTarget.style.color="rgba(176,244,103,0.7)")}
+            onMouseLeave={e=>(e.currentTarget.style.color="rgba(255,255,255,0.25)")}
+            title="Regenerate summary">↻</button>
           )}
         </div>
       </div>
