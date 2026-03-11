@@ -284,6 +284,215 @@ function SettingsPanel({config,onClose,onSave}:{config:any,onClose:()=>void,onSa
 }
 
 // ── Main App ──────────────────────────────────────────────────────────────────
+// ── AI Exec Summary ──────────────────────────────────────────────────────────
+function ExecSummary({ activeMarket, categories, newsapiByMarket, guardian, rss, history, isRamadan, fetched_at }:{
+  activeMarket:string; categories:any; newsapiByMarket:any; guardian:any;
+  rss:any; history:any[]; isRamadan:boolean; fetched_at:string;
+}){
+  const [summary, setSummary] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError]     = useState("");
+  const [lastMarket, setLastMarket] = useState("");
+  const abortRef = useRef<AbortController|null>(null);
+
+  useEffect(()=>{
+    if(!activeMarket || !categories) return;
+    // Cancel previous request
+    if(abortRef.current) abortRef.current.abort();
+    abortRef.current = new AbortController();
+
+    setSummary("");
+    setError("");
+    setLoading(true);
+    setLastMarket(activeMarket);
+
+    // Build signal snapshot for prompt
+    const catKeys = Object.keys(categories);
+    const mktNews = newsapiByMarket[activeMarket]||{};
+    const r = rss[activeMarket]||{};
+    const catSummaries = catKeys.map(ck=>{
+      const cat = categories[ck];
+      const sigs = Object.keys(cat.signals||{});
+      const topSigs = sigs
+        .map(s=>({ s, vol:(mktNews[s]||0)+(guardian[s]||0) }))
+        .sort((a,b)=>b.vol-a.vol)
+        .slice(0,3)
+        .map(x=>`${x.s.replace(/_/g," ")}(${x.vol})`)
+        .join(", ");
+      return `${cat.label}: ${topSigs||"low signal"}`;
+    }).join("\n");
+
+    // 7-day trend: compare last 7 days vs prior 7
+    const rec7 = history.slice(-7);
+    const rec14 = history.slice(-14,-7);
+    const trendStr = catKeys.map(ck=>{
+      const sigs = Object.keys(categories[ck]?.signals||{});
+      const avg = (recs:any[]) => {
+        const vals = recs.flatMap((rec:any)=>sigs.map(s=>rec.markets?.[activeMarket]?.[s]).filter((v:any)=>v!=null));
+        return vals.length ? Math.round(vals.reduce((a:number,b:number)=>a+b,0)/vals.length) : 0;
+      };
+      const now = avg(rec7), prev = avg(rec14);
+      const delta = now-prev;
+      return `${categories[ck].label}: ${now} (${delta>=0?"+":""}${delta} vs prior week)`;
+    }).join(", ");
+
+    const today = new Date().toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"});
+    const ramadanNote = isRamadan ? " Note: Ramadan is currently active — consumption patterns are shifted." : "";
+
+    const prompt = `You are a senior media strategist at WPP Media MENA. Today is ${today}.${ramadanNote}
+
+You are writing a concise executive intelligence briefing for the market: ${activeMarket}.
+
+SIGNAL DATA (news volume indexed today):
+${catSummaries}
+
+RSS TRENDS (${activeMarket} today):
+- Sport/Entertainment share: ${r.sport_entertainment_pct||0}%
+- Crisis/News share: ${r.crisis_pct||0}%
+- Top trending topics: ${(r.top_topics||[]).slice(0,5).join(", ")||"unavailable"}
+
+7-DAY TREND vs PRIOR WEEK (signal index 0-100):
+${trendStr}
+
+Write a 3-paragraph executive briefing for a media/marketing decision-maker:
+
+PARAGRAPH 1 — "Consumer Pulse": What is the dominant mood or behaviour of consumers in ${activeMarket} right now? Reference the strongest 2-3 signals specifically.
+
+PARAGRAPH 2 — "What's Driving It": Correlate the signal patterns with plausible real-world events or seasonal factors in ${activeMarket} and the wider MENA region as of ${today}. Reference Ramadan if active. Be specific and credible — name likely drivers even if probabilistic.
+
+PARAGRAPH 3 — "Media Implication": One sharp, actionable recommendation for a media planner or brand in ${activeMarket} this week. What should they do differently given this signal picture?
+
+Rules: Be direct, no fluff. Use signal names naturally. Maximum 180 words total. No headers or bullet points — flowing prose only. End with a single bolded "Signal Alert" sentence if any category shows >15 point week-on-week swing.`;
+
+    fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        model:"claude-sonnet-4-20250514",
+        max_tokens:1000,
+        stream:true,
+        messages:[{role:"user",content:prompt}]
+      }),
+      signal: abortRef.current.signal
+    })
+    .then(async res=>{
+      if(!res.ok){ throw new Error(`API ${res.status}`); }
+      const reader = res.body!.getReader();
+      const dec = new TextDecoder();
+      let buf = "";
+      while(true){
+        const {done,value} = await reader.read();
+        if(done) break;
+        buf += dec.decode(value,{stream:true});
+        const lines = buf.split("\n");
+        buf = lines.pop()||"";
+        for(const line of lines){
+          if(!line.startsWith("data: ")) continue;
+          const raw = line.slice(6).trim();
+          if(raw==="[DONE]") break;
+          try{
+            const ev = JSON.parse(raw);
+            // Anthropic SSE: content_block_delta has delta.type="text_delta" and delta.text
+            const delta =
+              (ev.type==="content_block_delta" && ev.delta?.type==="text_delta" && ev.delta.text) ||
+              (ev.delta?.text) ||
+              (ev.content?.[0]?.text) || "";
+            if(delta) setSummary(prev=>prev+delta);
+          }catch{}
+        }
+      }
+      setLoading(false);
+    })
+    .catch(e=>{
+      if(e.name!=="AbortError"){
+        setError("Could not generate summary. Check API key.");
+        setLoading(false);
+      }
+    });
+
+    return ()=>{ abortRef.current?.abort(); };
+  }, [activeMarket]);
+
+  const flagMap:Record<string,string> = {UAE:"🇦🇪",KSA:"🇸🇦",Kuwait:"🇰🇼",Qatar:"🇶🇦"};
+  const date = new Date(fetched_at).toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
+
+  return (
+    <div style={{
+      background:"linear-gradient(135deg,rgba(0,0,80,0.9) 0%,rgba(0,30,60,0.95) 100%)",
+      border:"1px solid rgba(176,244,103,0.25)",
+      borderLeft:"3px solid #B0F467",
+      borderRadius:8,
+      padding:"20px 24px",
+      marginBottom:28,
+      position:"relative",
+      overflow:"hidden",
+    }}>
+      {/* background glow */}
+      <div style={{position:"absolute",top:-60,right:-60,width:200,height:200,
+        background:"radial-gradient(circle,rgba(176,244,103,0.06) 0%,transparent 70%)",
+        pointerEvents:"none"}}/>
+
+      {/* header row */}
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          <div style={{
+            background:"rgba(176,244,103,0.15)",border:"1px solid rgba(176,244,103,0.3)",
+            borderRadius:4,padding:"3px 9px",fontSize:10,fontWeight:700,
+            color:"#B0F467",letterSpacing:1.5,textTransform:"uppercase"
+          }}>AI Intel</div>
+          <span style={{fontSize:12,fontWeight:600,color:"rgba(255,255,255,0.5)"}}>
+            {flagMap[activeMarket]} {activeMarket} · {date}
+          </span>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:6}}>
+          {loading && (
+            <div style={{display:"flex",gap:3,alignItems:"center"}}>
+              {[0,1,2].map(i=>(
+                <div key={i} style={{
+                  width:4,height:4,borderRadius:"50%",background:"#B0F467",
+                  animation:"pulse-dot 1.2s ease-in-out infinite",
+                  animationDelay:`${i*0.2}s`,opacity:0.7
+                }}/>
+              ))}
+              <span style={{fontSize:10,color:"rgba(255,255,255,0.4)",marginLeft:4}}>Generating…</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* body */}
+      {error ? (
+        <div style={{fontSize:12,color:"rgba(255,100,100,0.7)"}}>{error}</div>
+      ) : (
+        <div style={{
+          fontSize:13,lineHeight:1.75,color:"rgba(255,255,255,0.85)",
+          fontWeight:400,maxWidth:900,
+          whiteSpace:"pre-wrap",
+        }}>
+          {summary || (loading ? "" : <span style={{color:"rgba(255,255,255,0.25)",fontStyle:"italic"}}>Loading market intelligence…</span>)}
+          {loading && summary && <span style={{
+            display:"inline-block",width:2,height:14,
+            background:"#B0F467",marginLeft:2,
+            animation:"blink-cursor 0.8s step-end infinite",
+            verticalAlign:"middle"
+          }}/>}
+        </div>
+      )}
+
+      <style>{`
+        @keyframes pulse-dot {
+          0%,80%,100%{transform:scale(0.7);opacity:0.4}
+          40%{transform:scale(1.1);opacity:1}
+        }
+        @keyframes blink-cursor {
+          0%,100%{opacity:1} 50%{opacity:0}
+        }
+      `}</style>
+    </div>
+  );
+}
+
+
 export default function App(){
   const [data,         setData]         = useState<any>(null);
   const [config,       setConfig]       = useState<any>(null);
@@ -776,6 +985,18 @@ export default function App(){
       </div>
 
       <main className="main">
+
+        {/* ── AI Exec Summary ── */}
+        <ExecSummary
+          activeMarket={activeMarket}
+          categories={categories}
+          newsapiByMarket={newsapiByMarket}
+          guardian={guardian}
+          rss={rss}
+          history={history}
+          isRamadan={!!isRamadan}
+          fetched_at={data.fetched_at||new Date().toISOString()}
+        />
 
         {/* ── Category overview ── */}
         <div>
