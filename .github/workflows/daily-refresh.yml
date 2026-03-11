@@ -1,13 +1,15 @@
-name: Crisis Pulse — Daily Data Refresh
+name: Daily Pulse Refresh
 
 on:
   schedule:
-    - cron: '0 5 * * *'   # 05:00 UTC = 09:00 GST every day
-  workflow_dispatch:        # also allows manual trigger from GitHub UI
+    - cron: '0 5 * * *'   # 05:00 UTC = 09:00 GST daily
+  workflow_dispatch:        # allow manual trigger from GitHub UI
 
 jobs:
-  fetch-trends:
+  collect:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repo
@@ -19,15 +21,22 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install pytrends pandas
+        run: pip install pytrends pandas requests python-dotenv
 
-      - name: Run data collector
+      - name: Run collector
+        env:
+          NEWSAPI_KEY: ${{ secrets.NEWSAPI_KEY }}
+          GUARDIAN_KEY: ${{ secrets.GUARDIAN_KEY }}
+          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
+          TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
         run: python scripts/collect.py
 
-      - name: Commit and push updated data
+      - name: Commit and push data
         run: |
-          git config user.name  "Crisis Pulse Bot"
-          git config user.email "bot@crisis-pulse"
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add public/pulse_data.json
-          git diff --staged --quiet || git commit -m "chore: daily pulse data refresh $(date -u '+%Y-%m-%d %H:%M UTC')"
-          git push
+          git diff --staged --quiet || (
+            git commit -m "chore: daily pulse refresh $(date -u '+%Y-%m-%d %H:%M UTC')"
+            git push
+          )
