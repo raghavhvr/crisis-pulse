@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-03-11T10:42:42.886320+00:00",
+  "fetched_at": "2026-03-11T10:47:41.879565+00:00",
   "dates": [
     "Mar 04",
     "Mar 05",
@@ -1725,6 +1725,7 @@
         "sport_entertainment_pct": 0,
         "crisis_pct": 30,
         "top_topics": [
+          "difc",
           "dubai airport iran war",
           "dubai iran attack",
           "mehidy hasan miraz",
@@ -1733,15 +1734,13 @@
           "instagram down",
           "chat gtp",
           "uae iran war",
-          "drone",
-          "eid holidays 2026 uae"
+          "drone"
         ]
       },
       "KSA": {
         "sport_entertainment_pct": 0,
         "crisis_pct": 0,
         "top_topics": [
-          "nahid rana",
           "mehidy hasan miraz",
           "\u0627\u062c\u0627\u0632\u0629 \u0639\u064a\u062f \u0627\u0644\u0641\u0637\u0631 2026",
           "booking",
@@ -1750,7 +1749,8 @@
           "icc",
           "muhammad rizwan",
           "dammam airport",
-          "saudi flag day"
+          "saudi flag day",
+          "gulf air"
         ]
       },
       "Kuwait": {
@@ -1787,204 +1787,32 @@
       }
     },
     "twitch": {
-      "total_viewers": 210960,
+      "total_viewers": 210523,
       "top_games": [
         {
           "name": "Dota 2",
-          "viewers": 65172
+          "viewers": 67411
         },
         {
           "name": "Street Fighter 6",
-          "viewers": 50701
+          "viewers": 48194
         },
         {
           "name": "League of Legends",
-          "viewers": 39856
+          "viewers": 34442
         },
         {
           "name": "Just Chatting",
-          "viewers": 17292
+          "viewers": 17590
         },
         {
           "name": "Super Mario 64",
-          "viewers": 13434
+          "viewers": 13838
         }
       ]
     }
   },
   "news_volumes": {
-    "newsapi": {
-      "UAE": {
-        "gaming": 0,
-        "streaming": 0,
-        "humour": 0,
-        "beauty": 0,
-        "breaking_news": 0,
-        "crisis_topics": 0,
-        "war_news": 0,
-        "flight_searches": 0,
-        "fact_checking": 0,
-        "social_news": 0,
-        "price_comparison": 0,
-        "discounts": 0,
-        "budgeting": 0,
-        "inflation": 0,
-        "panic_buying": 0,
-        "panic_selling": 0,
-        "food_delivery": 0,
-        "online_shopping": 0,
-        "home_improvement": 0,
-        "travel": 0,
-        "mental_health": 0,
-        "meditation": 0,
-        "fitness": 0,
-        "sleep": 0,
-        "therapy": 0,
-        "charity": 0,
-        "volunteering": 0,
-        "community": 0,
-        "iftar_delivery": 0,
-        "late_night": 0,
-        "eid_shopping": 0,
-        "suhoor": 0
-      },
-      "KSA": {
-        "gaming": 0,
-        "streaming": 0,
-        "humour": 0,
-        "beauty": 0,
-        "breaking_news": 0,
-        "crisis_topics": 0,
-        "war_news": 0,
-        "flight_searches": 0,
-        "fact_checking": 0,
-        "social_news": 0,
-        "price_comparison": 0,
-        "discounts": 0,
-        "budgeting": 0,
-        "inflation": 0,
-        "panic_buying": 0,
-        "panic_selling": 0,
-        "food_delivery": 0,
-        "online_shopping": 0,
-        "home_improvement": 0,
-        "travel": 0,
-        "mental_health": 0,
-        "meditation": 0,
-        "fitness": 0,
-        "sleep": 0,
-        "therapy": 0,
-        "charity": 0,
-        "volunteering": 0,
-        "community": 0,
-        "iftar_delivery": 0,
-        "late_night": 0,
-        "eid_shopping": 0,
-        "suhoor": 0
-      },
-      "Kuwait": {
-        "gaming": 0,
-        "streaming": 0,
-        "humour": 0,
-        "beauty": 0,
-        "breaking_news": 0,
-        "crisis_topics": 0,
-        "war_news": 0,
-        "flight_searches": 0,
-        "fact_checking": 0,
-        "social_news": 0,
-        "price_comparison": 0,
-        "discounts": 0,
-        "budgeting": 0,
-        "inflation": 0,
-        "panic_buying": 0,
-        "panic_selling": 0,
-        "food_delivery": 0,
-        "online_shopping": 0,
-        "home_improvement": 0,
-        "travel": 0,
-        "mental_health": 0,
-        "meditation": 0,
-        "fitness": 0,
-        "sleep": 0,
-        "therapy": 0,
-        "charity": 0,
-        "volunteering": 0,
-        "community": 0,
-        "iftar_delivery": 0,
-        "late_night": 0,
-        "eid_shopping": 0,
-        "suhoor": 0
-      },
-      "Qatar": {
-        "gaming": 0,
-        "streaming": 0,
-        "humour": 0,
-        "beauty": 0,
-        "breaking_news": 0,
-        "crisis_topics": 0,
-        "war_news": 0,
-        "flight_searches": 0,
-        "fact_checking": 0,
-        "social_news": 0,
-        "price_comparison": 0,
-        "discounts": 0,
-        "budgeting": 0,
-        "inflation": 0,
-        "panic_buying": 0,
-        "panic_selling": 0,
-        "food_delivery": 0,
-        "online_shopping": 0,
-        "home_improvement": 0,
-        "travel": 0,
-        "mental_health": 0,
-        "meditation": 0,
-        "fitness": 0,
-        "sleep": 0,
-        "therapy": 0,
-        "charity": 0,
-        "volunteering": 0,
-        "community": 0,
-        "iftar_delivery": 0,
-        "late_night": 0,
-        "eid_shopping": 0,
-        "suhoor": 0
-      }
-    },
-    "newsapi_global": {
-      "gaming": 0,
-      "streaming": 0,
-      "humour": 0,
-      "beauty": 0,
-      "breaking_news": 0,
-      "crisis_topics": 0,
-      "war_news": 0,
-      "flight_searches": 0,
-      "fact_checking": 0,
-      "social_news": 0,
-      "price_comparison": 0,
-      "discounts": 0,
-      "budgeting": 0,
-      "inflation": 0,
-      "panic_buying": 0,
-      "panic_selling": 0,
-      "food_delivery": 0,
-      "online_shopping": 0,
-      "home_improvement": 0,
-      "travel": 0,
-      "mental_health": 0,
-      "meditation": 0,
-      "fitness": 0,
-      "sleep": 0,
-      "therapy": 0,
-      "charity": 0,
-      "volunteering": 0,
-      "community": 0,
-      "iftar_delivery": 0,
-      "late_night": 0,
-      "eid_shopping": 0,
-      "suhoor": 0
-    },
     "guardian": {
       "gaming": 19,
       "streaming": 24,
@@ -2023,14 +1851,15 @@
   "sources_live": [
     "wikipedia",
     "google_rss",
-    "newsapi",
     "guardian",
     "twitch"
   ],
-  "sources_failed": [],
+  "sources_failed": [
+    "newsapi"
+  ],
   "ramadan_active": true,
   "summaries": {
-    "Kuwait": "WPP Media MENA strategist. 11 March 2026. Market: Kuwait. Ramadaan is active\n\nSignals: Escapism & Entertainment: humor(53), beauty(45), streaming(24); News & Crisis Awareness: breaking news(491), war news(476), crisis topics(282); Economic Anxiety: price comparison(96), inflation(92), panic sellers(86); Behavioral Shifts: travel(135), home improvement(101), food delivery(52); Wellness & Menatal Health: sleep(60), mental health(57), therapy(37); Social & Community: community(170), charity(44), volunteering(3); Ramadaan: late nights(19), iftars delivered(18), suhoors(15)\nRSs: sport 20%, criis 10%, trening  abdu'l samad, al jazir ya baladi\n\nWrite 3 short paragraphs (120 words",
-    "UAE": "WPP Media MENA strategist. 11 March 2026. Market: UAE. Ramadaan is active, with the following three short paragraphs (120 words max):\n\n1. Consumer Pulse \u2014 dominant behaviour now, name top 2 signals\n    - Signals: Escapism & Entertainment: humour(53), beauty(45), streaming(24); News & Crisis Awareness: breaking news(491), war news(476), crisi\u0441 topics(282); Economic Anxiety: price comparison(96), inflation(92), panic selling(86); Behavioral Shifts: travel(135), home improvement(101), food delivery(52); Wellness & Menatal Health: sleep(60), mental health(57), therapy(37)\n    - Ramadaan: late nights, iftar delivery, suhoor (Saturday, 14th September 2021)\n    \n2. Media Implication \u2014 one sharp action for a brand this week\n    - Signals"
+    "Qatar": "As Ramadaan begins in Qatar on the 11th of March 2026, the following signals are prevalent across media and market:\n\n1. Escapism & Entertainment: Humour, Beauty, Streaming, News & Crisis Awareness, Economic Anxiety, Price Comparison, Inflation, Panic Sellings, Travel, Home Improvement, Food Delivery, Wellness & Mental Health, Social & Community, Charity, Volunteering, Sport 40%, Criisi 10%, Trenning (Nahid Rana, Abdul Samad, ICC, MAZAD Sadaqa), name top 2 signals\n\n2. Ramadaan: Name top 2 signals, Real-world correlation for Qatar, 11 March 2026\n3. Media Implication: One sharp action for a brand this week",
+    "UAE": "WPP Media MENA strategist | 11 March 2026 | Market: UAE | Ramadaan is active | Signals:\nEscapism & Entertainment: Humour, Beauty, Streaming (24%), News & Crisis Awareness (53%), Economic Anxiety (92%), Behavioral Shifts (101%), Wellness & Menatal Health (Sleep (60%, Mental Health (57%, Therapy (37%), Social & Community (Community (170%, Charity (44%, Volunteering (3%)\nRSs: Sport 0%, Criisis 30%, Trenching (Difc, Dubai airport Iran War, Dubai Iran attack, MEHIDY HAZAN MIRZA)\nParses | 120 words max | WPP Media MENA strategist, Ramadaan is active in UAE"
   }
 }
