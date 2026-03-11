@@ -514,88 +514,99 @@ def collect():
 
 
 
-# ── AI Summaries ──────────────────────────────────────────────────────────────
+# ── AI Summaries (template-based — deterministic, no external API needed) ─────
 
-def build_prompt(market: str, data: dict, config: dict) -> str:
-    categories = config.get("categories", {})
-    newsapi_raw = data.get("news_volumes", {}).get("newsapi", {})
-    guardian = data.get("news_volumes", {}).get("guardian", {})
-    rss = data.get("global", {}).get("rss_trends", {}).get(market, {})
+def generate_market_summary(market: str, data: dict, config: dict) -> str:
+    """Generate a data-driven 3-paragraph market brief directly from signals."""
+    from datetime import timezone as tz
+    categories    = config.get("categories", {})
+    newsapi_raw   = data.get("news_volumes", {}).get("newsapi", {})
+    guardian      = data.get("news_volumes", {}).get("guardian", {})
+    rss           = data.get("global", {}).get("rss_trends", {}).get(market, {})
     is_per_market = isinstance(next(iter(newsapi_raw.values()), None), dict)
-    mkt_news = newsapi_raw.get(market, {}) if is_per_market else newsapi_raw
+    mkt_news      = newsapi_raw.get(market, {}) if is_per_market else newsapi_raw
+    is_ramadan    = bool(data.get("ramadan_active") and config.get("ramadan_active"))
 
-    cat_lines = []
+    # Score every active signal by news volume
+    all_signals: dict = {}
     for ck, cat in categories.items():
-        sigs = list(cat.get("signals", {}).keys())
-        top = sorted(sigs, key=lambda s: (mkt_news.get(s, 0) + guardian.get(s, 0)), reverse=True)[:3]
-        vols = [f"{s.replace('_',' ')}({mkt_news.get(s,0)+guardian.get(s,0)})" for s in top]
-        cat_lines.append(f"{cat['label']}: {', '.join(vols) or 'low signal'}")
+        if cat.get("ramadan_only") and not is_ramadan:
+            continue
+        for sk in cat.get("signals", {}).keys():
+            score = (mkt_news.get(sk, 0) + guardian.get(sk, 0))
+            all_signals[sk] = {"score": score, "cat": ck, "cat_label": cat["label"]}
 
-    today = datetime.now(timezone.utc).strftime("%-d %B %Y")
-    ramadan = config.get("ramadan_active") and data.get("ramadan_active")
-    ramadan_note = " Ramadan is active." if ramadan else ""
+    ranked   = sorted(all_signals.items(), key=lambda x: x[1]["score"], reverse=True)
+    top2     = ranked[:2]
 
-    sport_pct = rss.get("sport_entertainment_pct", 0)
+    cat_scores: dict = {}
+    for sk, info in all_signals.items():
+        cat_scores[info["cat"]] = cat_scores.get(info["cat"], 0) + info["score"]
+    top_cat_key   = max(cat_scores, key=cat_scores.get) if cat_scores else ""
+    top_cat_label = categories.get(top_cat_key, {}).get("label", "")
+
+    sport_pct  = rss.get("sport_entertainment_pct", 0)
     crisis_pct = rss.get("crisis_pct", 0)
-    topics = ", ".join(rss.get("top_topics", [])[:4]) or "n/a"
+    trending   = rss.get("top_topics", [])[:3]
+    trend_str  = ", ".join(trending) if trending else None
 
-    return (
-        f"WPP Media MENA strategist. {today}. Market: {market}.{ramadan_note}\n\n"
-        f"Signals: {'; '.join(cat_lines)}\n"
-        f"RSS: sport {sport_pct}%, crisis {crisis_pct}%, trending: {topics}\n\n"
-        f"Write 3 short paragraphs (120 words max):\n"
-        f"1. Consumer Pulse — dominant behaviour now, name top 2 signals\n"
-        f"2. What's Driving It — real-world correlation for {market}, {today}\n"
-        f"3. Media Implication — one sharp action for a brand this week\n"
-        f"No headers. Flowing prose only."
-    )
+    def sig_label(sk: str) -> str:
+        return sk.replace("_", " ")
 
+    # P1: Consumer Pulse
+    p1_sigs    = " and ".join(f"**{sig_label(s)}**" for s, _ in top2)
+    mood       = "crisis-driven" if crisis_pct > sport_pct else "entertainment-led"
+    ramadan_p1 = " Ramadan is amplifying late-night activity and iftar-related consumption." if is_ramadan else ""
+    p1 = (f"Consumer attention in {market} is concentrated around {p1_sigs}, "
+          f"which together dominate the signal landscape. "
+          f"The overall mood is {mood}, with {top_cat_label} emerging as the strongest category.{ramadan_p1}")
 
-def generate_summary(prompt: str) -> str:
-    """Call mlvoca (tinyllama — fast, no reasoning blocks, no IP restrictions)."""
-    import urllib.request
-    payload = json.dumps({
-        "model": "tinyllama",
-        "prompt": prompt,
-        "stream": False,
-        "options": {"temperature": 0.7, "num_predict": 250}
-    }).encode()
-    req = urllib.request.Request(
-        "https://mlvoca.com/api/generate",
-        data=payload,
-        headers={"Content-Type": "application/json"},
-        method="POST"
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=45) as resp:
-            result = json.loads(resp.read())
-            return result.get("response", "").strip()
-    except Exception as e:
-        log.warning(f"  mlvoca failed: {e}")
-        return ""
+    # P2: What's Driving It
+    drivers = []
+    if crisis_pct >= 20:
+        drivers.append(f"elevated regional crisis coverage ({crisis_pct}% of trending topics)")
+    if sport_pct >= 20:
+        drivers.append(f"strong sports and entertainment engagement ({sport_pct}%)")
+    if is_ramadan:
+        drivers.append("the Ramadan consumption cycle shifting peak hours to evenings")
+    if trend_str:
+        drivers.append(f"trending conversations around {trend_str}")
+    if not drivers:
+        drivers.append("a mix of seasonal and regional factors")
+    p2 = (f"This pattern is being driven by {'; '.join(drivers)}. "
+          f"The {sig_label(top2[0][0])} signal in particular reflects the current media environment "
+          f"across MENA, with audiences actively tracking developing stories alongside daily life.")
+
+    # P3: Media Implication
+    if crisis_pct >= 20:
+        action = (f"avoid hard promotional messaging this week — "
+                  f"contextual and empathy-led creatives will perform better alongside "
+                  f"{sig_label(top2[0][0])} content environments")
+    elif is_ramadan:
+        action = (f"activate Ramadan prime time (9–11pm) — iftar-moment sponsorships "
+                  f"and evening digital placements capture peak {sig_label(top2[1][0])} engagement")
+    else:
+        action = (f"lean into {top_cat_label.lower()} environments — "
+                  f"the {sig_label(top2[0][0])} signal suggests audiences are primed "
+                  f"for discovery content over hard sell this week")
+    p3 = f"For media planners in {market}: {action}."
+
+    return f"{p1}\n\n{p2}\n\n{p3}"
 
 
 def generate_all_summaries(data: dict, config: dict) -> dict:
-    """Generate summaries for all markets in parallel to save time."""
-    from concurrent.futures import ThreadPoolExecutor, as_completed
     markets = ["UAE", "KSA", "Kuwait", "Qatar"]
-    log.info("\n🤖 Generating AI summaries (parallel)...")
-
-    def _gen(market):
-        prompt = build_prompt(market, data, config)
-        return market, generate_summary(prompt)
-
+    log.info("\n🤖 Generating market summaries...")
     summaries = {}
-    with ThreadPoolExecutor(max_workers=4) as ex:
-        futures = {ex.submit(_gen, m): m for m in markets}
-        for future in as_completed(futures):
-            market, text = future.result()
-            if text:
-                summaries[market] = text
-                log.info(f"  ✓ {market} ({len(text)} chars)")
-            else:
-                log.warning(f"  ✗ {market} summary failed")
+    for market in markets:
+        try:
+            text = generate_market_summary(market, data, config)
+            summaries[market] = text
+            log.info(f"  ✓ {market} ({len(text.split())} words)")
+        except Exception as e:
+            log.warning(f"  ✗ {market}: {e}")
     return summaries
+
 
 # ── Entry ─────────────────────────────────────────────────────────────────────
 
