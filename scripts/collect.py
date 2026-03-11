@@ -18,6 +18,14 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
 log = logging.getLogger(__name__)
 
 MARKETS = {"AE": "UAE", "SA": "KSA", "KW": "Kuwait", "QA": "Qatar"}
+
+# NewsAPI geo-filter terms per market
+MARKET_NEWS_TERMS = {
+    "UAE":    "UAE OR Dubai OR "Abu Dhabi" OR Emirates",
+    "KSA":    ""Saudi Arabia" OR Riyadh OR Jeddah OR KSA",
+    "Kuwait": "Kuwait OR "Kuwait City"",
+    "Qatar":  "Qatar OR Doha",
+}
 SPORT_KW  = ["football","soccer","game","match","vs","ucl","league","cup","sport",
              "film","movie","music","cricket","ipl","nba","f1","basketball"]
 CRISIS_KW = ["war","attack","crisis","shortage","price","inflation","ban",
@@ -137,11 +145,16 @@ def fetch_wiki_list(article: str, start: str, end: str) -> list:
 
 # ── Source 3: NewsAPI ─────────────────────────────────────────────────────────
 
-def fetch_newsapi(query: str, from_date: str, api_key: str) -> int:
+def fetch_newsapi(query: str, from_date: str, api_key: str, market: str = "") -> int:
     if not api_key: return 0
+    geo = MARKET_NEWS_TERMS.get(market, "")
+    full_query = f"({query}) AND ({geo})" if geo else query
     r = safe_get("https://newsapi.org/v2/everything",
-                 params={"q": query, "from": from_date, "language": "en", "pageSize": 1, "apiKey": api_key})
-    return r.json().get("totalResults", 0) if r and r.status_code == 200 else 0
+                 params={"q": full_query, "from": from_date, "language": "en", "pageSize": 1, "apiKey": api_key})
+    if r and r.status_code == 200:
+        return r.json().get("totalResults", 0)
+    log.warning(f"  NewsAPI error {r.status_code if r else 'timeout'} [{market or 'global'}]")
+    return 0
 
 
 # ── Source 4: Guardian ────────────────────────────────────────────────────────
@@ -216,14 +229,15 @@ def backfill(signals: dict, guardian_key: str, newsapi_key: str) -> list:
             guardian[sig_key] = weekly
             log.info(f"  ✓ Guardian {sig_key}: {len(weekly)} day estimates")
 
-    # NewsAPI: 30-day total → daily average
-    newsapi: dict[str, int] = {}
+    # NewsAPI: 30-day total per market → daily average
+    newsapi: dict[str, dict] = {m: {} for m in MARKETS.values()}
     if newsapi_key:
         from_date = start.strftime("%Y-%m-%d")
-        for sig_key, cfg in signals.items():
-            time.sleep(0.3)
-            total = fetch_newsapi(cfg["news"], from_date, newsapi_key)
-            newsapi[sig_key] = round(total / BACKFILL_DAYS)
+        for market_name in MARKETS.values():
+            for sig_key, cfg in signals.items():
+                time.sleep(0.3)
+                total = fetch_newsapi(cfg["news"], from_date, newsapi_key, market_name)
+                newsapi[market_name][sig_key] = round(total / BACKFILL_DAYS)
 
     # Assemble daily records
     records = []
@@ -241,7 +255,9 @@ def backfill(signals: dict, guardian_key: str, newsapi_key: str) -> list:
 
         for sig_key in signals:
             g = guardian.get(sig_key, {}).get(day_key, 0)
-            n = newsapi.get(sig_key, 0)
+            # Average across markets for history record
+            n_vals = [newsapi.get(m, {}).get(sig_key, 0) for m in MARKETS.values()]
+            n = round(sum(n_vals) / len(n_vals)) if n_vals else 0
             record["news_volumes"][sig_key] = g + n
 
         records.append(record)
@@ -266,7 +282,9 @@ def append_today(history: list, pulse: dict, signals: dict) -> list:
             for sig_key in signals
         }
     for sig_key in signals:
-        na = pulse.get("news_volumes", {}).get("newsapi",  {}).get(sig_key, 0)
+        # newsapi is now per-market dict; use global rollup if available
+        na_src = pulse.get("news_volumes", {}).get("newsapi_global") or pulse.get("news_volumes", {}).get("newsapi", {})
+        na = na_src.get(sig_key, 0) if isinstance(na_src, dict) and not isinstance(next(iter(na_src.values()), 0), dict) else 0
         gd = pulse.get("news_volumes", {}).get("guardian", {}).get(sig_key, 0)
         snap["news_volumes"][sig_key] = na + gd
 
@@ -380,16 +398,22 @@ def collect():
     else:
         result["sources_failed"].append("google_rss")
 
-    # ── NewsAPI ──────────────────────────────────────────────────────────────
-    log.info("\n📰 NewsAPI...")
+    # ── NewsAPI (per market) ─────────────────────────────────────────────────
+    log.info("\n📰 NewsAPI (per market)...")
     if newsapi_key:
-        news_vols = {}
-        for sig_key, cfg in signals.items():
-            time.sleep(0.4)
-            count = fetch_newsapi(cfg["news"], from_date, newsapi_key)
-            news_vols[sig_key] = count
-            log.info(f"  ✓ {sig_key}: {count}")
-        result["news_volumes"]["newsapi"] = news_vols
+        news_vols_by_market: dict = {m: {} for m in MARKETS.values()}
+        for market_name in MARKETS.values():
+            for sig_key, cfg in signals.items():
+                time.sleep(0.3)
+                count = fetch_newsapi(cfg["news"], from_date, newsapi_key, market_name)
+                news_vols_by_market[market_name][sig_key] = count
+            log.info(f"  ✓ {market_name}: {sum(news_vols_by_market[market_name].values())} total articles")
+        result["news_volumes"]["newsapi"] = news_vols_by_market
+        # Also keep a global rollup for backwards compat
+        result["news_volumes"]["newsapi_global"] = {
+            sig: sum(news_vols_by_market[m].get(sig, 0) for m in MARKETS.values())
+            for sig in signals
+        }
         result["sources_live"].append("newsapi")
     else:
         log.warning("  ✗ NEWSAPI_KEY not set")

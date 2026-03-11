@@ -55,13 +55,17 @@ function CategoryCard({
 }){
   const catSignals = Object.keys(signals).filter(k=>signals[k].category===catKey);
 
-  // News volume score: sum of newsapi+guardian for this category's signals
-  // This is market-agnostic but gives a real content intensity measure
-  const newsTotal = catSignals.reduce((acc,k)=>{
-    return acc + (newsapi[k]||0) + (guardian[k]||0);
-  }, 0);
+  // News volume: per-market from NewsAPI geo-filtered queries
+  const newsVolumes = catSignals.map(k=>(newsapi[k]||0)+(guardian[k]||0));
+  const newsTotal   = newsVolumes.reduce((a,b)=>a+b,0);
+  const newsMax     = Math.max(...newsVolumes,1);
 
-  // Wikipedia index: global signal, same across markets (honest)
+  // Normalise news total to 0-99 score (log scale so large values don't dominate)
+  const newsScore = newsTotal > 0
+    ? Math.min(99, Math.round(Math.log(newsTotal+1)/Math.log(5000)*99))
+    : 0;
+
+  // Wikipedia: global index as secondary context
   const wikiValues = catSignals.map(k=>{
     const v = markets[activeMarket]?.[k];
     return Array.isArray(v) ? v[v.length-1] : null;
@@ -70,28 +74,29 @@ function CategoryCard({
     ? Math.round(wikiValues.reduce((a,b)=>a+b,0)/wikiValues.length)
     : null;
 
-  // RSS market signal: use crisis% for crisis_awareness cat, sport% for escapism, combined for others
+  // RSS market signal
   const rssMarket = rss[activeMarket]||{};
   let rssSignal = 0;
   if(catKey==="crisis_awareness") rssSignal = rssMarket.crisis_pct||0;
   else if(catKey==="escapism")    rssSignal = rssMarket.sport_entertainment_pct||0;
   else rssSignal = Math.round(((rssMarket.sport_entertainment_pct||0)+(rssMarket.crisis_pct||0))/2);
 
-  // Display score: wiki if available, else news-normalised
-  const displayScore = wikiAvg !== null ? wikiAvg : Math.min(99, Math.round(newsTotal/50));
+  // Primary display score = news volume (market-specific) + rss modifier
+  const hasNewsData = newsTotal > 0;
+  const displayScore = hasNewsData
+    ? Math.min(99, Math.round(newsScore * 0.7 + rssSignal * 0.3))
+    : (wikiAvg ?? 0);
 
-  // Sparkline from wiki 7-day series (averaged across signals)
-  const marketData = markets[activeMarket]||{};
-  const len = Math.max(...catSignals.map(k=>Array.isArray(marketData[k])?marketData[k].length:0), 0);
-  const sparkData = len > 0
-    ? Array.from({length:Math.min(len,8)},(_,i)=>{
-        const vs = catSignals.map(k=>marketData[k]?.[i]).filter(v=>v!=null) as number[];
-        return vs.length ? Math.round(vs.reduce((a,b)=>a+b,0)/vs.length) : 0;
+  // Sparkline: per-signal news volumes (market-specific bars)
+  const hasRealData = hasNewsData || (wikiValues.length > 0);
+  const sparkData = hasNewsData
+    ? catSignals.map(k=>{
+        const v = (newsapi[k]||0)+(guardian[k]||0);
+        return Math.round((v/newsMax)*90)+5;
       })
-    : [20,25,22,28,30,27,32,displayScore]; // placeholder shape until collector runs
+    : Array.from({length:8},(_,i)=>20+i*2); // placeholder
   const sparkMax = Math.max(...sparkData,1);
   const trend = sparkData.length>=2 ? sparkData[sparkData.length-1]-sparkData[0] : 0;
-  const hasRealData = len > 0;
 
   return (
     <div className={`cat-card ${isActive?"active":""}`}
@@ -149,7 +154,7 @@ function SignalRow({sigKey,sig,markets,activeMarket,dates,newsapi,guardian}:{
   const prev = vals[vals.length-2]??curr;
   const pct  = prev ? Math.round(((curr-prev)/prev)*100) : 0;
   const chartData = dates.map((d:string,i:number)=>({date:d,value:vals[i]??null}));
-  const news  = (newsapi[sigKey]||0)+(guardian[sigKey]||0);
+  const news  = (newsapi[sigKey]||0)+(guardian[sigKey]||0); // newsapi already market-filtered
 
   return (
     <div className="signal-row">
@@ -337,7 +342,12 @@ export default function App(){
   const global       = data.global||{};
   const rss          = global.rss_trends||{};
   const twitch       = global.twitch||{};
-  const newsapi      = data.news_volumes?.newsapi||{};
+  // newsapi is now per-market: { UAE: { gaming: 12, ... }, KSA: ... }
+  // or legacy flat: { gaming: 28, ... }
+  const newsapiRaw   = data.news_volumes?.newsapi||{};
+  const newsapiGlobal= data.news_volumes?.newsapi_global||{};
+  const isPerMarket  = newsapiRaw[activeMarket] !== undefined;
+  const newsapi      = isPerMarket ? (newsapiRaw[activeMarket]||{}) : newsapiRaw;
   const guardian     = data.news_volumes?.guardian||{};
   const dates        = data.dates||[];
   const sources      = data.sources_live||[];
