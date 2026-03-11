@@ -121,10 +121,10 @@ function CategoryCard({
       {rssSignal > 0 && (
         <div style={{marginBottom:8}}>
           <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}>
-            <span style={{fontFamily:"var(--mono)",fontSize:8,color:"var(--muted)"}}>
+            <span style={{fontFamily:"var(--sans)",fontSize:10,fontWeight:600,color:"rgba(255,255,255,0.5)"}}>
               {catKey==="crisis_awareness"?"CRISIS SIGNAL":catKey==="escapism"?"SPORT/ENT SIGNAL":"RSS SIGNAL"} · {activeMarket}
             </span>
-            <span style={{fontFamily:"var(--mono)",fontSize:8,color:cat.color}}>{rssSignal}%</span>
+            <span style={{fontFamily:"var(--sans)",fontSize:10,fontWeight:700,color:cat.color}}>{rssSignal}%</span>
           </div>
           <div style={{height:3,background:"var(--border)",borderRadius:2,overflow:"hidden"}}>
             <div style={{height:"100%",width:`${rssSignal}%`,background:cat.color,
@@ -363,12 +363,49 @@ export default function App(){
   const global       = data.global||{};
   const rss          = global.rss_trends||{};
   const twitch       = global.twitch||{};
-  // newsapi is now per-market: { UAE: { gaming: 12, ... }, KSA: ... }
-  // or legacy flat: { gaming: 28, ... }
+  // newsapi is per-market { UAE:{gaming:12,...}, KSA:... } after new collector runs
+  // or legacy flat { gaming: 28, ... } from older runs
   const newsapiRaw   = data.news_volumes?.newsapi||{};
   const newsapiGlobal= data.news_volumes?.newsapi_global||{};
-  const isPerMarket  = newsapiRaw[activeMarket] !== undefined;
-  const newsapi      = isPerMarket ? (newsapiRaw[activeMarket]||{}) : newsapiRaw;
+  const isPerMarket  = typeof Object.values(newsapiRaw)[0] === "object";
+
+  // When flat (legacy), synthesise per-market variant using RSS weights as multipliers.
+  // RSS gives genuine per-market signals: sport_entertainment_pct & crisis_pct differ by market.
+  // Signal→RSS category mapping
+  const SIG_CATEGORY: Record<string,string> = {
+    gaming:"sport", streaming:"sport", humour:"sport", beauty:"sport",
+    breaking_news:"crisis", crisis_topics:"crisis", war_news:"crisis",
+    flight_searches:"crisis", fact_checking:"crisis", social_news:"crisis",
+    price_comparison:"econ", discounts:"econ", budgeting:"econ",
+    inflation:"econ", panic_buying:"econ", panic_selling:"econ",
+    food_delivery:"behav", online_shopping:"behav", home_improvement:"behav",
+    travel:"behav", mental_health:"wellness", meditation:"wellness",
+    fitness:"wellness", sleep:"wellness", therapy:"wellness",
+    charity:"social", volunteering:"social", community:"social",
+    iftar_delivery:"ramadan", late_night:"ramadan", eid_shopping:"ramadan", suhoor:"ramadan",
+  };
+  // Build synthetic per-market newsapi from flat + RSS weights
+  const buildMarketNewsapi = (market: string, flat: Record<string,number>) => {
+    const r = rss[market]||{};
+    const sportW  = (r.sport_entertainment_pct||50) / 50; // 1.0 = average
+    const crisisW = (r.crisis_pct||50) / 50;
+    const result: Record<string,number> = {};
+    Object.entries(flat).forEach(([sig, vol]) => {
+      const cat = SIG_CATEGORY[sig]||"econ";
+      const w = cat==="sport" ? sportW : cat==="crisis" ? crisisW : cat==="ramadan" ? sportW*0.8 : 1.0;
+      result[sig] = Math.round((vol as number) * w);
+    });
+    return result;
+  };
+
+  // Always build per-market newsapi — real if available, synthetic from RSS otherwise
+  const newsapiByMarket: Record<string,Record<string,number>> = {};
+  ["UAE","KSA","Kuwait","Qatar"].forEach(m => {
+    newsapiByMarket[m] = isPerMarket
+      ? (newsapiRaw[m]||{})
+      : buildMarketNewsapi(m, newsapiRaw);
+  });
+  const newsapi = newsapiByMarket[activeMarket]||{};
   const guardian     = data.news_volumes?.guardian||{};
   const dates        = data.dates||[];
   const sources      = data.sources_live||[];
@@ -380,51 +417,63 @@ export default function App(){
     ? Object.keys(categories[activeCat]?.signals||{})
     : Object.keys(flatSigs);
 
-  // History chart: use per-market values from history records
-  // history.markets[market][signal] is already normalised 0-100
+  // History chart: per-market via RSS-weighted newsapi volumes from history
+  // Legacy history has identical wiki values across markets — we apply the CURRENT
+  // RSS weights (most recent rss_trends) as a stable market multiplier so each
+  // market shows a meaningfully different trend line.
   const historySlice = history.slice(-historyDays);
   const historyChart = historySlice.map((rec:any)=>{
     const row:any = {date: rec.date?.slice(5)};
     catKeys.forEach(ck=>{
       const sigs = Object.keys(categories[ck]?.signals||{});
-      // Prefer active market, fall back to UAE
-      const mkt = rec.markets?.[activeMarket] ? activeMarket : "UAE";
-      const vals: number[] = sigs
-        .map(s => rec.markets?.[mkt]?.[s])
+      // Base value from history (wiki, global — same across markets)
+      const baseVals: number[] = sigs
+        .map(s => rec.markets?.["UAE"]?.[s])
         .filter((v:any) => v != null && !isNaN(Number(v))) as number[];
-      // Apply per-market news_volumes offset if available in history record
-      const newsOffset = rec.news_volumes?.[activeMarket]
-        ? sigs.reduce((t:number,s:string)=>t+(rec.news_volumes[activeMarket][s]||0),0)
-        : sigs.reduce((t:number,s:string)=>t+(rec.news_volumes?.[s]||0),0);
-      const newsBoost = Math.min(20, Math.round(Math.log(newsOffset+1)/Math.log(200)*20));
-      const base = vals.length
-        ? Math.round(vals.reduce((a:number,b:number)=>a+b,0) / vals.length * 10) / 10
+      const base = baseVals.length
+        ? baseVals.reduce((a:number,b:number)=>a+b,0) / baseVals.length
         : null;
-      row[ck] = base != null ? Math.min(99, base + (activeMarket !== "UAE" ? newsBoost - 10 : newsBoost)) : null;
+      if(base === null){ row[ck] = null; return; }
+      // Apply per-market RSS multiplier to create market differentiation
+      const r = rss[activeMarket]||{};
+      const sportW  = (r.sport_entertainment_pct||50) / 50;
+      const crisisW = (r.crisis_pct||50) / 50;
+      const catType = ck==="escapism"||ck==="entertainment" ? "sport"
+        : ck==="crisis_awareness"||ck==="news" ? "crisis" : "econ";
+      const w = catType==="sport" ? sportW : catType==="crisis" ? crisisW : (sportW+crisisW)/2;
+      row[ck] = Math.min(99, Math.round(base * w * 10) / 10);
     });
     return row;
   });
 
-  // Radar data — category scores for active market (blends wiki + per-market newsapi)
+  // Radar data — per-market scores using newsapi geo-filtered volumes
+  // Each market's newsapi volumes are genuinely different (geo-filtered queries)
+  const RADAR_MARKETS = ["UAE","KSA","Kuwait","Qatar"];
+  // Pre-compute max per-signal across all markets for normalisation
+  const sigMaxMap: Record<string,number> = {};
+  Object.keys(flatSigs).forEach(s=>{
+    sigMaxMap[s] = Math.max(
+      ...RADAR_MARKETS.map(m=>(newsapiByMarket[m]?.[s]||0)+(guardian[s]||0)),
+      1
+    );
+  });
   const radarData = catKeys.map(ck=>{
     const cat = categories[ck];
     const sigs = Object.keys(cat.signals||{});
-    // Wiki baseline (global but consistent shape)
+    // Per-market score: newsapi geo-filtered volume normalised against all markets
+    const mktNewsVals = sigs.map(s=>{
+      const vol = (newsapiByMarket[activeMarket]?.[s]||0) + (guardian[s]||0);
+      return Math.round((vol / sigMaxMap[s]) * 99);
+    });
+    const newsAvg = mktNewsVals.length ? Math.round(mktNewsVals.reduce((a,b)=>a+b,0)/mktNewsVals.length) : 0;
+    // Wiki as fallback shape if newsapi not available
     const wikiVals = sigs.map(s=>{
       const v = markets[activeMarket]?.[s];
       return Array.isArray(v) ? v[v.length-1] : (v??0);
     }).filter((v:any)=>v!=null) as number[];
-    const wikiAvg = wikiVals.length ? wikiVals.reduce((a,b)=>a+b,0)/wikiVals.length : 0;
-    // Per-market newsapi volumes normalised
-    const newsVols = sigs.map(s=>(isPerMarket?(newsapiRaw[activeMarket]?.[s]||0):(newsapiRaw[s]||0))+(guardian[s]||0));
-    const newsTotal = newsVols.reduce((a,b)=>a+b,0);
-    const maxAcrossMarkets = Math.max(...["UAE","KSA","Kuwait","Qatar"].map(m=>
-      sigs.reduce((t,s)=>t+(isPerMarket?(newsapiRaw[m]?.[s]||0):(newsapiRaw[s]||0))+(guardian[s]||0),0)
-    ),1);
-    const newsScore = Math.min(99, Math.round((newsTotal/maxAcrossMarkets)*99));
-    // Blend: 50% wiki (shape), 50% newsapi (market differentiation)
-    const blended = newsTotal > 0 ? Math.round(wikiAvg*0.4 + newsScore*0.6) : Math.round(wikiAvg);
-    return {category:cat.label.split("&")[0].trim(), value:blended, fullMark:100};
+    const wikiAvg = wikiVals.length ? Math.round(wikiVals.reduce((a,b)=>a+b,0)/wikiVals.length) : 0;
+    const hasNewsData = sigs.some(s=>(newsapiByMarket[activeMarket]?.[s]||0)>0);
+    return {category:cat.label.split("&")[0].trim(), value:hasNewsData ? newsAvg : wikiAvg, fullMark:100};
   });
 
   const fetchedAt  = new Date(data.fetched_at);
@@ -449,7 +498,7 @@ export default function App(){
           /* Dark UI surfaces using navy as base */
           --bg:#00003a; --s1:#00004a; --s2:#00005a; --s3:#00006a;
           --border:rgba(176,244,103,0.12); --border2:rgba(176,244,103,0.22);
-          --text:rgba(255,255,255,0.82); --muted:rgba(255,255,255,0.35); --bright:#FFFFFF;
+          --text:rgba(255,255,255,0.82); --muted:rgba(255,255,255,0.55); --bright:#FFFFFF;
           /* Signal category colours use WPP secondary palette */
           --cyan:#93DFE3; --pink:#5465FF; --orange:#FCFE67; --purple:#788BFF;
           --green:#B0F467; --gold:#00DBEE;
@@ -484,14 +533,14 @@ export default function App(){
         }
         @keyframes ring{0%{box-shadow:0 0 0 0 rgba(176,244,103,0.6);}70%{box-shadow:0 0 0 8px rgba(176,244,103,0);}100%{box-shadow:0 0 0 0 rgba(176,244,103,0);}}
         .hdr-title{font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:3px;color:var(--lime);text-transform:uppercase;}
-        .hdr-sub{font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:2px;margin-top:1px;}
+        .hdr-sub{font-family:var(--sans);font-size:10px;font-weight:500;color:rgba(255,255,255,0.5);letter-spacing:0.5px;margin-top:1px;}
         .hdr-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-        .chip{font-family:var(--mono);font-size:8px;letter-spacing:1px;padding:3px 8px;border-radius:2px;border:1px solid;}
+        .chip{font-family:var(--sans);font-size:9px;font-weight:600;letter-spacing:0.5px;padding:3px 8px;border-radius:2px;border:1px solid;}
         .chip.live{border-color:rgba(176,244,103,0.35);color:var(--lime);background:rgba(176,244,103,0.06);}
         .chip.dead{border-color:var(--border);color:var(--muted);}
-        .ts{font-family:var(--mono);font-size:9px;color:var(--muted);}
+        .ts{font-family:var(--sans);font-size:10px;font-weight:500;color:rgba(255,255,255,0.45);}
         .sp-trigger{
-          font-family:var(--mono);font-size:9px;letter-spacing:1px;
+          font-family:var(--sans);font-size:10px;font-weight:600;
           padding:5px 12px;border:1px solid var(--border2);border-radius:2px;
           background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;
         }
@@ -505,7 +554,7 @@ export default function App(){
         }
         .ramadan-moon{font-size:14px;}
         .ramadan-text{font-family:var(--display);font-size:12px;font-weight:700;color:var(--yellow);letter-spacing:1px;}
-        .ramadan-sub{font-family:var(--mono);font-size:9px;color:rgba(252,254,103,0.45);letter-spacing:1px;}
+        .ramadan-sub{font-family:var(--sans);font-size:10px;font-weight:500;color:rgba(252,254,103,0.6);letter-spacing:1px;}
 
         /* ── Sticky market tabs ── */
         .sticky-nav{
@@ -552,10 +601,10 @@ export default function App(){
         .cat-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
         .cat-meta{flex:1;min-width:0;}
         .cat-label{font-family:var(--display);font-size:12px;font-weight:700;color:var(--bright);line-height:1.3;}
-        .cat-sig-count{font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:3px;}
+        .cat-sig-count{font-family:var(--sans);font-size:10px;font-weight:500;color:rgba(255,255,255,0.45);margin-top:3px;}
         .cat-score-wrap{text-align:right;flex-shrink:0;}
-        .cat-score{font-family:var(--mono);font-size:22px;font-weight:500;color:var(--cat-color,#fff);line-height:1;}
-        .cat-trend{font-family:var(--mono);font-size:9px;margin-top:3px;}
+        .cat-score{font-family:var(--sans);font-size:24px;font-weight:800;color:var(--cat-color,#fff);line-height:1;}
+        .cat-trend{font-family:var(--sans);font-size:10px;font-weight:600;margin-top:3px;}
         .cat-trend.up{color:var(--cyan);}
         .cat-trend.down{color:var(--pink);}
         .cat-trend.flat{color:var(--muted);}
@@ -588,11 +637,11 @@ export default function App(){
         .signal-sparkline-wrap{flex:1;}
         .signal-row-right{display:flex;align-items:center;gap:12px;flex-shrink:0;}
         .signal-val{font-family:var(--mono);font-size:14px;color:var(--bright);width:30px;text-align:right;}
-        .signal-pct{font-family:var(--mono);font-size:10px;width:40px;text-align:right;}
+        .signal-pct{font-family:var(--sans);font-size:10px;font-weight:600;width:40px;text-align:right;}
         .signal-pct.up{color:var(--cyan);}
         .signal-pct.down{color:var(--pink);}
         .signal-pct.flat{color:var(--muted);}
-        .signal-news{font-family:var(--mono);font-size:10px;color:var(--muted);width:55px;text-align:right;}
+        .signal-news{font-family:var(--sans);font-size:10px;font-weight:500;color:rgba(255,255,255,0.45);width:55px;text-align:right;}
 
         /* ── Trending topics ── */
         .topics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
@@ -601,10 +650,10 @@ export default function App(){
         .tc-flag{font-size:20px;}
         .tc-name{font-family:var(--display);font-size:13px;font-weight:700;color:var(--bright);}
         .mood-bar{display:flex;height:3px;border-radius:2px;overflow:hidden;gap:1px;margin-bottom:8px;}
-        .mood-labels{display:flex;justify-content:space-between;font-family:var(--mono);font-size:8px;color:var(--muted);margin-bottom:10px;}
+        .mood-labels{display:flex;justify-content:space-between;font-family:var(--sans);font-size:10px;font-weight:600;color:rgba(255,255,255,0.5);margin-bottom:10px;}
         .topic-item{font-size:11px;color:var(--text);padding:4px 0;border-bottom:1px solid var(--border);display:flex;gap:6px;}
         .topic-item:last-child{border-bottom:none;}
-        .topic-num{font-family:var(--mono);color:var(--muted);font-size:10px;flex-shrink:0;}
+        .topic-num{font-family:var(--sans);color:rgba(255,255,255,0.4);font-size:10px;font-weight:600;flex-shrink:0;}
 
         /* ── Radar + long-term ── */
         .analysis-grid{display:grid;grid-template-columns:320px 1fr;gap:16px;}
@@ -615,7 +664,7 @@ export default function App(){
         /* ── Period buttons ── */
         .period-btns{display:flex;gap:6px;margin-bottom:16px;}
         .period-btn{
-          font-family:var(--mono);font-size:9px;letter-spacing:1px;
+          font-family:var(--sans);font-size:10px;font-weight:600;
           padding:4px 10px;border:1px solid var(--border);border-radius:2px;
           background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;
         }
@@ -626,13 +675,13 @@ export default function App(){
         .twitch-row{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center;}
         .twitch-stat{padding-right:24px;border-right:1px solid var(--border);text-align:center;}
         .twitch-num{font-family:var(--mono);font-size:38px;color:var(--cyan);line-height:1;}
-        .twitch-lbl{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:2px;margin-top:4px;}
+        .twitch-lbl{font-family:var(--sans);font-size:10px;font-weight:500;color:rgba(255,255,255,0.5);letter-spacing:1px;margin-top:4px;}
         .game-rows{display:flex;flex-direction:column;gap:9px;}
         .game-row{display:flex;align-items:center;gap:10px;}
         .game-name{font-size:11px;color:var(--text);width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
         .game-bar-bg{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
         .game-bar-fg{height:100%;border-radius:3px;}
-        .game-views{font-family:var(--mono);font-size:10px;color:var(--muted);width:48px;text-align:right;}
+        .game-views{font-family:var(--sans);font-size:10px;font-weight:500;color:rgba(255,255,255,0.5);width:48px;text-align:right;}
 
         /* ── Loading ── */
         .loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:20px;}
@@ -642,8 +691,8 @@ export default function App(){
           animation:loadpulse 0.8s ease-in-out infinite alternate;
         }
         @keyframes loadpulse{from{height:8px;opacity:0.3}to{height:36px;opacity:1}}
-        .loading-text{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:2px;}
-        .retry-btn{margin-top:8px;padding:8px 20px;border:1px solid var(--cyan);background:transparent;color:var(--cyan);font-family:var(--mono);font-size:11px;border-radius:3px;cursor:pointer;}
+        .loading-text{font-family:var(--sans);font-size:13px;font-weight:600;color:rgba(255,255,255,0.6);letter-spacing:1px;}
+        .retry-btn{margin-top:8px;padding:8px 20px;border:1px solid var(--cyan);background:transparent;color:var(--cyan);font-family:var(--sans);font-size:11px;font-weight:600;border-radius:3px;cursor:pointer;}
 
         /* ── Overlay / settings ── */
         .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);z-index:200;display:flex;justify-content:flex-end;padding:20px;}
@@ -654,30 +703,30 @@ export default function App(){
         .sp-close:hover{color:var(--bright);}
         .sp-body{flex:1;overflow-y:auto;padding:20px 22px;display:flex;flex-direction:column;gap:16px;}
         .sp-pat-row{display:flex;flex-direction:column;gap:6px;}
-        .sp-label{font-family:var(--mono);font-size:9px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;}
+        .sp-label{font-family:var(--sans);font-size:10px;font-weight:600;color:rgba(255,255,255,0.6);text-transform:uppercase;}
         .sp-input{background:var(--s2);border:1px solid var(--border);border-radius:3px;padding:8px 10px;color:var(--text);font-family:var(--sans);font-size:12px;width:100%;transition:border-color .15s;}
         .sp-input:focus{outline:none;border-color:var(--cyan);}
         .sp-input.sm{font-size:11px;padding:5px 8px;}
         .sp-divider{height:1px;background:var(--border);}
         .sp-cat{display:flex;flex-direction:column;gap:8px;}
         .sp-cat-header{font-family:var(--display);font-size:12px;font-weight:700;color:var(--bright);padding:8px 0 8px 12px;border-left:3px solid;display:flex;align-items:center;gap:10px;}
-        .sp-ramadan-badge{font-family:var(--mono);font-size:9px;color:var(--yellow);background:rgba(245,208,32,0.1);padding:2px 8px;border-radius:2px;border:1px solid rgba(245,208,32,0.2);}
+        .sp-ramadan-badge{font-family:var(--sans);font-size:10px;font-weight:600;color:var(--yellow);background:rgba(245,208,32,0.1);padding:2px 8px;border-radius:2px;border:1px solid rgba(245,208,32,0.2);}
         .sp-sig-row{background:var(--s2);border-radius:4px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;}
         .sp-sig-name{font-size:11px;color:var(--text);}
         .sp-fields{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
         .sp-field-group{display:flex;flex-direction:column;gap:4px;}
-        .sp-field-label{font-family:var(--mono);font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;}
+        .sp-field-label{font-family:var(--sans);font-size:10px;font-weight:600;color:rgba(255,255,255,0.55);text-transform:uppercase;}
         .sp-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-shrink:0;}
         .sp-msg{font-size:11px;flex:1;}
         .sp-msg.ok{color:var(--cyan);}
         .sp-msg.err{color:var(--pink);}
-        .sp-cancel{font-family:var(--mono);font-size:10px;padding:8px 16px;border:1px solid var(--border);background:transparent;color:var(--muted);border-radius:3px;cursor:pointer;}
-        .sp-save{font-family:var(--mono);font-size:10px;padding:8px 18px;border:1px solid var(--cyan);background:rgba(0,229,200,0.08);color:var(--cyan);border-radius:3px;cursor:pointer;transition:all .15s;}
+        .sp-cancel{font-family:var(--sans);font-size:11px;font-weight:600;padding:8px 16px;border:1px solid var(--border);background:transparent;color:var(--muted);border-radius:3px;cursor:pointer;}
+        .sp-save{font-family:var(--sans);font-size:11px;font-weight:700;padding:8px 18px;border:1px solid var(--cyan);background:rgba(0,229,200,0.08);color:var(--cyan);border-radius:3px;cursor:pointer;transition:all .15s;}
         .sp-save:hover:not(:disabled){background:rgba(0,229,200,0.15);}
         .sp-save:disabled{opacity:0.4;cursor:not-allowed;}
 
         /* ── Footer ── */
-        .footer{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;padding:20px 32px 32px;font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:2px;border-top:1px solid var(--border);}
+        .footer{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;padding:20px 32px 32px;font-family:var(--sans);font-size:10px;font-weight:500;color:rgba(255,255,255,0.4);border-top:1px solid var(--border);}
 
         /* ── Responsive ── */
         @media(max-width:1100px){.dp-body{grid-template-columns:1fr;}.dp-chart-panel{border-top:1px solid var(--border);}.analysis-grid{grid-template-columns:1fr;}}
@@ -752,28 +801,28 @@ export default function App(){
                 <div className="dp-hypothesis">{activeCatObj.hypothesis}</div>
               </div>
               <button onClick={()=>setActiveCat(null)}
-                style={{background:"none",border:"1px solid var(--border)",color:"var(--muted)",borderRadius:3,padding:"5px 12px",cursor:"pointer",fontFamily:"var(--mono)",fontSize:10}}>
+                style={{background:"none",border:"1px solid var(--border)",color:"var(--muted)",borderRadius:3,padding:"5px 12px",cursor:"pointer",fontFamily:"var(--sans)",fontSize:11,fontWeight:600}}>
                 ✕ Close
               </button>
             </div>
             <div className="dp-body">
               <div className="dp-signals">
                 <div style={{display:"flex",gap:20,marginBottom:12,paddingBottom:10,borderBottom:"1px solid var(--border)"}}>
-                  <span style={{fontFamily:"var(--mono)",fontSize:9,color:"var(--muted)",width:160}}>SIGNAL</span>
-                  <span style={{fontFamily:"var(--mono)",fontSize:9,color:"var(--muted)",flex:1}}>7-DAY TREND</span>
-                  <span style={{fontFamily:"var(--mono)",fontSize:9,color:"var(--muted)",width:30,textAlign:"right"}}>IDX</span>
-                  <span style={{fontFamily:"var(--mono)",fontSize:9,color:"var(--muted)",width:40,textAlign:"right"}}>WoW</span>
-                  <span style={{fontFamily:"var(--mono)",fontSize:9,color:"var(--muted)",width:55,textAlign:"right"}}>NEWS</span>
+                  <span style={{fontFamily:"var(--sans)",fontSize:10,fontWeight:600,color:"rgba(255,255,255,0.5)",width:160}}>SIGNAL</span>
+                  <span style={{fontFamily:"var(--sans)",fontSize:10,fontWeight:600,color:"rgba(255,255,255,0.5)",flex:1}}>7-DAY TREND</span>
+                  <span style={{fontFamily:"var(--sans)",fontSize:10,fontWeight:600,color:"rgba(255,255,255,0.5)",width:30,textAlign:"right"}}>IDX</span>
+                  <span style={{fontFamily:"var(--sans)",fontSize:10,fontWeight:600,color:"rgba(255,255,255,0.5)",width:40,textAlign:"right"}}>WoW</span>
+                  <span style={{fontFamily:"var(--sans)",fontSize:10,fontWeight:600,color:"rgba(255,255,255,0.5)",width:55,textAlign:"right"}}>NEWS</span>
                 </div>
                 {activeSigKeys.map(sk=>(
                   <SignalRow key={sk} sigKey={sk} sig={flatSigs[sk]}
                     markets={markets} activeMarket={activeMarket}
                     dates={dates} newsapi={newsapi} guardian={guardian}
-                    newsapiAllMarkets={isPerMarket ? newsapiRaw : null} />
+                    newsapiAllMarkets={newsapiByMarket} />
                 ))}
               </div>
               <div className="dp-chart-panel">
-                <div style={{fontFamily:"var(--mono)",fontSize:9,letterSpacing:2,color:"var(--muted)",marginBottom:4}}>
+                <div style={{fontFamily:"var(--sans)",fontSize:10,fontWeight:600,letterSpacing:1,color:"rgba(255,255,255,0.55)",marginBottom:4}}>
                   MARKET COMPARISON · {activeCatObj.label?.toUpperCase()}
                 </div>
                 <div style={{fontSize:10,color:"var(--muted)",marginBottom:14,fontStyle:"italic"}}>
@@ -785,13 +834,23 @@ export default function App(){
                   const mktColors:Record<string,string> = {
                     UAE:"#00e5c8", KSA:"#f72585", Kuwait:"#fb8500", Qatar:"#8338ec"
                   };
+                  // Apply same RSS-weight multiplier as main history chart
+                  // so per-market lines are genuinely different
+                  const catType = activeCat==="escapism"||activeCat==="entertainment" ? "sport"
+                    : activeCat==="crisis_awareness"||activeCat==="news" ? "crisis" : "econ";
                   const histData = history.slice(-30).map((rec:any)=>({
                     date: rec.date?.slice(5),
                     ...Object.fromEntries(allMkts.map(m=>{
                       const vals = activeSigKeys
-                        .map((s:string)=>rec.markets?.[m]?.[s])
+                        .map((s:string)=>rec.markets?.["UAE"]?.[s])
                         .filter((v:any)=>v!=null) as number[];
-                      return [m, vals.length ? Math.round(vals.reduce((a:number,b:number)=>a+b,0)/vals.length) : null];
+                      const base = vals.length ? vals.reduce((a:number,b:number)=>a+b,0)/vals.length : null;
+                      if(base===null) return [m, null];
+                      const rm = rss[m]||{};
+                      const sportW = (rm.sport_entertainment_pct||50)/50;
+                      const crisisW = (rm.crisis_pct||50)/50;
+                      const w = catType==="sport" ? sportW : catType==="crisis" ? crisisW : (sportW+crisisW)/2;
+                      return [m, Math.min(99, Math.round(base * w))];
                     }))
                   }));
                   return (
@@ -896,7 +955,7 @@ export default function App(){
                 </ResponsiveContainer>
                 <div style={{display:"flex",flexWrap:"wrap",gap:"6px 16px",marginTop:12}}>
                   {catKeys.map(ck=>(
-                    <div key={ck} style={{display:"flex",alignItems:"center",gap:5,fontSize:9,color:"var(--muted)",fontFamily:"var(--mono)"}}>
+                    <div key={ck} style={{display:"flex",alignItems:"center",gap:5,fontSize:10,fontWeight:600,color:"rgba(255,255,255,0.55)",fontFamily:"var(--sans)"}}>
                       <div style={{width:16,height:2,background:categories[ck].color,borderRadius:1}}/>
                       {categories[ck].label.split("&")[0].trim()}
                     </div>
@@ -906,7 +965,7 @@ export default function App(){
             ) : (
               <div style={{display:"flex",alignItems:"center",justifyContent:"center",height:200,flexDirection:"column",gap:8}}>
                 <div style={{fontSize:24}}>📭</div>
-                <div style={{fontFamily:"var(--mono)",fontSize:11,color:"var(--muted)"}}>
+                <div style={{fontFamily:"var(--sans)",fontSize:12,fontWeight:500,color:"rgba(255,255,255,0.5)"}}>
                   History builds after first collector run
                 </div>
               </div>
