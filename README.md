@@ -1,60 +1,152 @@
-# Crisis Pulse — MENA Media & Search Dashboard
+# Crisis Pulse
 
-Auto-refreshing consumer signal dashboard for GroupM MENA crisis monitoring.
-Pulls Google Trends data daily via GitHub Actions. No backend server required.
+**Real-time consumer signal dashboard for MENA markets.**
+
+Built for GroupM MENA crisis reporting. Monitors behavioral and media signals across UAE, KSA, Kuwait, and Qatar — refreshed daily, zero infrastructure cost.
+
+---
+
+## What It Does
+
+Crisis Pulse aggregates five independent data sources into a single dashboard, tracking how consumer attention shifts during periods of economic or social disruption. It is designed to surface early signals across gaming/escapism, wellness, price sensitivity, delivery behavior, and news consumption — before they appear in paid research.
+
+---
+
+## Data Sources
+
+| Source | What It Measures | Auth Required |
+|---|---|---|
+| **Wikipedia Pageviews** | Daily interest index per signal topic (normalized 0–100) | None |
+| **Google Trends RSS** | Trending search topics per market, classified by category | None |
+| **NewsAPI** | Global article volume per signal keyword over 7 days | Free API key |
+| **The Guardian API** | Editorial article volume per signal keyword over 7 days | Free API key |
+| **Twitch API** | Live global gaming viewership and top titles | Free app registration |
+
+All sources are free tier. No paid APIs. No cloud server.
+
+---
+
+## Markets
+
+UAE · KSA · Kuwait · Qatar
+
+---
 
 ## Architecture
 
 ```
-GitHub Actions (cron: daily 09:00 GST)
-    └── scripts/collect.py          ← pulls pytrends for 4 markets × 5 signals
-            └── public/pulse_data.json  ← committed to repo
-
-StackBlitz / Vercel (frontend)
-    └── src/App.tsx                 ← reads pulse_data.json on page load
+GitHub Actions (daily 09:00 GST)
+    └── scripts/collect.py
+            ├── Wikipedia Pageviews API
+            ├── Google Trends RSS
+            ├── NewsAPI
+            ├── Guardian API
+            └── Twitch API
+                    ↓
+            public/pulse_data.json  (committed to repo)
+                    ↓
+            Vercel (auto-deploys on push)
+                    ↓
+            src/App.tsx  (reads /pulse_data.json at load)
 ```
 
-## Setup (one time)
+No backend server. The collector runs on GitHub's infrastructure, writes a static JSON file, and Vercel serves it. The dashboard is a pure frontend React app.
 
-### 1. Create this repo on GitHub
-Upload all files maintaining this structure:
+---
+
+## Dashboard Sections
+
+**Signal Snapshot** — Latest Wikipedia interest index per signal for the selected market, with week-on-week delta badges.
+
+**Trending Topics** — Per-market Google RSS breakdown showing today's top trending searches, classified into sport/entertainment vs crisis categories.
+
+**Behavioral Trends** — 7-day Wikipedia pageview trend lines for all signals, with a per-signal deep-dive view. Market-switchable.
+
+**News Volume** — Side-by-side NewsAPI vs Guardian article counts per signal over the past 7 days.
+
+**Live Gaming** — Twitch total live viewership and top 5 titles by viewer count, pulled at collection time.
+
+---
+
+## Setup
+
+### 1. Clone the repo
+
+```bash
+git clone https://github.com/raghavhvr/crisis-pulse
+cd crisis-pulse
 ```
-.github/workflows/daily-refresh.yml
-scripts/collect.py
-public/pulse_data.json
-src/App.tsx
+
+### 2. Install frontend dependencies
+
+```bash
+npm install
+npm run dev
 ```
 
-### 2. Update the data URL in App.tsx
-On line 10, replace:
-```js
-const REPO_RAW_URL = "https://raw.githubusercontent.com/YOUR_USERNAME/crisis-pulse/main/public/pulse_data.json";
+### 3. Configure API keys
+
+Create a `.env` file in the repo root (never committed):
+
 ```
-With your actual GitHub username and repo name.
+NEWSAPI_KEY=your_key_here
+GUARDIAN_KEY=your_key_here
+TWITCH_CLIENT_ID=your_client_id_here
+TWITCH_CLIENT_SECRET=your_client_secret_here
+```
 
-### 3. Enable GitHub Actions
-Go to your repo → Actions tab → enable workflows if prompted.
-The workflow runs daily at 05:00 UTC (09:00 GST) automatically.
+Get free keys from:
+- NewsAPI → [newsapi.org](https://newsapi.org)
+- Guardian → [open-platform.theguardian.com](https://open-platform.theguardian.com)
+- Twitch → [dev.twitch.tv/console](https://dev.twitch.tv/console)
 
-To trigger a manual run: Actions → "Crisis Pulse — Daily Data Refresh" → "Run workflow"
+### 4. Run the collector locally
 
-### 4. Deploy frontend on StackBlitz or Vercel
-- **StackBlitz**: paste App.tsx contents into src/App.tsx, run `npm install recharts`
-- **Vercel**: connect GitHub repo, auto-deploys on every commit (including daily data pushes)
+```bash
+pip install -r requirements.txt
+python scripts/collect.py
+```
 
-## Signals tracked
+This writes `public/pulse_data.json`. The dashboard reads from this file.
 
-| Signal | Keyword | What it measures |
-|--------|---------|-----------------|
-| Gaming | "gaming" | Escapism / entertainment shift |
-| Wellness | "wellness" | Anxiety / self-care signal |
-| News | "news" | Crisis awareness monitoring |
-| Cheap | "cheap" | Price sensitivity indicator |
-| Delivery | "delivery" | Retail avoidance signal |
+### 5. Deploy
 
-## Markets
-UAE (AE) · KSA (SA) · Kuwait (KW) · Qatar (QA)
+**Vercel** — connect the GitHub repo, set framework to Vite, deploy. Vercel auto-redeploys on every push.
 
-## Cost
-**Zero.** GitHub Actions free tier gives 2,000 minutes/month.
-The daily script runs in under 3 minutes.
+**GitHub Actions** — add your four API keys as repository secrets (Settings → Secrets → Actions). The workflow runs daily at 05:00 UTC and commits fresh data automatically.
+
+---
+
+## GitHub Actions Secrets Required
+
+| Secret | Source |
+|---|---|
+| `NEWSAPI_KEY` | newsapi.org |
+| `GUARDIAN_KEY` | open-platform.theguardian.com |
+| `TWITCH_CLIENT_ID` | dev.twitch.tv |
+| `TWITCH_CLIENT_SECRET` | dev.twitch.tv |
+
+---
+
+## Local Development
+
+```bash
+npm run dev       # start Vite dev server
+python scripts/collect.py   # refresh data manually
+```
+
+The dashboard reads from `/pulse_data.json` at page load. Re-run the collector any time to update the data locally.
+
+---
+
+## Requirements
+
+**Frontend** — React 18, Vite, Recharts, TypeScript
+
+**Collector** — Python 3.11+, `requests`, `python-dotenv`
+
+---
+
+## License
+
+Internal tool — GroupM MENA. Not for public redistribution.
