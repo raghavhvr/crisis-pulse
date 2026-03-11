@@ -4,8 +4,8 @@
   "categories": {
     "escapism": {
       "label": "Escapism & Entertainment",
-      "icon": "◈",
-      "color": "#00f5d4",
+      "icon": "\u25c8",
+      "color": "#B0F467",
       "hypothesis": "Stress drives people toward distraction and comfort content",
       "signals": {
         "gaming": {
@@ -36,8 +36,8 @@
     },
     "crisis_awareness": {
       "label": "News & Crisis Awareness",
-      "icon": "◎",
-      "color": "#f72585",
+      "icon": "\u25ce",
+      "color": "#5465FF",
       "hypothesis": "Crisis triggers spike in news consumption and information seeking",
       "signals": {
         "breaking_news": {
@@ -80,8 +80,8 @@
     },
     "economic_anxiety": {
       "label": "Economic Anxiety",
-      "icon": "◇",
-      "color": "#fb8500",
+      "icon": "\u25c7",
+      "color": "#FCFE67",
       "hypothesis": "Financial stress changes search and purchase intent signals",
       "signals": {
         "price_comparison": {
@@ -124,8 +124,8 @@
     },
     "behavioral_shifts": {
       "label": "Behavioral Shifts",
-      "icon": "◐",
-      "color": "#8338ec",
+      "icon": "\u25d0",
+      "color": "#93DFE3",
       "hypothesis": "Crisis changes how people shop, move and spend time",
       "signals": {
         "food_delivery": {
@@ -156,8 +156,8 @@
     },
     "wellness": {
       "label": "Wellness & Mental Health",
-      "icon": "◉",
-      "color": "#06d6a0",
+      "icon": "\u25c9",
+      "color": "#00DBEE",
       "hypothesis": "Prolonged stress surfaces as wellness and mental health interest",
       "signals": {
         "mental_health": {
@@ -194,8 +194,8 @@
     },
     "social_community": {
       "label": "Social & Community",
-      "icon": "◆",
-      "color": "#fee440",
+      "icon": "\u25c6",
+      "color": "#788BFF",
       "hypothesis": "Crisis drives community-seeking and prosocial behavior",
       "signals": {
         "charity": {
@@ -220,9 +220,9 @@
     },
     "ramadan": {
       "label": "Ramadan",
-      "icon": "☽",
-      "color": "#ffd166",
-      "hypothesis": "Ramadan shifts consumption patterns — iftar, late-night, Eid prep",
+      "icon": "\u263d",
+      "color": "#FCFE67",
+      "hypothesis": "Ramadan shifts consumption patterns \u2014 iftar, late-night, Eid prep",
       "ramadan_only": true,
       "signals": {
         "iftar_delivery": {
