@@ -431,7 +431,7 @@ export default function App(){
       const sigs = Object.keys(categories[ck]?.signals||{});
       // Base value from history (wiki, global — same across markets)
       const baseVals: number[] = sigs
-        .map(s => rec.markets?.[m]?.[s])
+        .map(s => rec.markets?.["UAE"]?.[s])
         .filter((v:any) => v != null && !isNaN(Number(v))) as number[];
       const base = baseVals.length
         ? baseVals.reduce((a:number,b:number)=>a+b,0) / baseVals.length
@@ -846,7 +846,7 @@ export default function App(){
                     date: rec.date?.slice(5),
                     ...Object.fromEntries(allMkts.map(m=>{
                       const vals = activeSigKeys
-                        .map((s:string)=>rec.markets?.[m]?.[s])
+                        .map((s:string)=>rec.markets?.["UAE"]?.[s])
                         .filter((v:any)=>v!=null) as number[];
                       const base = vals.length ? vals.reduce((a:number,b:number)=>a+b,0)/vals.length : null;
                       if(base===null) return [m, null];
