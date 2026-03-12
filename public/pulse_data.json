@@ -1,14 +1,14 @@
 {
-  "fetched_at": "2026-03-11T10:47:41.879565+00:00",
+  "fetched_at": "2026-03-12T04:04:47.634240+00:00",
   "dates": [
-    "Mar 04",
     "Mar 05",
     "Mar 06",
     "Mar 07",
     "Mar 08",
     "Mar 09",
     "Mar 10",
-    "Mar 11"
+    "Mar 11",
+    "Mar 12"
   ],
   "categories": {
     "escapism": {
@@ -1401,451 +1401,451 @@
     "wikipedia": {
       "gaming": [
         100.0,
-        93.4,
-        85.4,
-        79.2,
-        38.9,
-        62.8,
-        90.6,
-        52.8
+        91.4,
+        84.8,
+        41.6,
+        67.3,
+        97.0,
+        56.5,
+        55.8
       ],
       "streaming": [
-        89.5,
         88.5,
         78.8,
         100.0,
         74.3,
         85.1,
         89.3,
-        85.7
+        85.7,
+        86.0
       ],
       "humour": [
-        93.2,
         92.9,
         100.0,
         93.1,
         84.1,
         76.5,
         93.2,
-        90.9
+        90.9,
+        92.4
       ],
       "beauty": [
-        88.7,
         86.7,
         100.0,
         85.7,
         70.9,
         67.0,
         92.6,
+        77.8,
         77.8
       ],
       "breaking_news": [
+        81.0,
+        74.0,
+        69.7,
+        74.5,
         100.0,
-        71.1,
-        65.0,
-        61.2,
-        65.4,
-        87.8,
-        85.2,
+        97.0,
+        96.1,
         84.4
       ],
       "crisis_topics": [
-        82.1,
-        88.0,
-        84.6,
-        78.6,
-        70.1,
-        76.9,
-        94.9,
+        83.7,
+        80.5,
+        74.8,
+        66.7,
+        73.2,
+        90.2,
+        95.1,
         100.0
       ],
       "war_news": [
+        92.6,
+        91.9,
         100.0,
-        92.0,
-        91.3,
-        99.3,
+        62.4,
+        60.0,
         62.0,
-        59.6,
-        61.6,
-        59.1
+        59.5,
+        62.5
       ],
       "flight_searches": [
-        87.5,
         80.8,
         91.8,
         85.7,
         93.3,
         77.1,
         92.7,
-        100.0
+        100.0,
+        73.2
       ],
       "fact_checking": [
-        87.9,
         100.0,
         75.7,
         80.3,
         74.6,
         50.3,
         93.6,
-        96.0
+        96.0,
+        89.0
       ],
       "social_news": [
-        93.8,
-        85.4,
-        87.2,
-        84.0,
-        66.6,
-        73.1,
-        100.0,
-        99.3
+        83.8,
+        85.6,
+        82.5,
+        65.4,
+        71.7,
+        98.2,
+        97.6,
+        100.0
       ],
       "price_comparison": [
-        28.6,
         100.0,
         71.4,
         100.0,
         100.0,
         14.3,
         42.9,
-        14.3
+        14.3,
+        57.1
       ],
       "discounts": [
-        93.8,
-        75.0,
-        91.7,
-        100.0,
-        37.5,
-        60.4,
-        91.7,
-        64.6
+        35.0,
+        42.7,
+        46.6,
+        17.5,
+        28.2,
+        42.7,
+        30.1,
+        100.0
       ],
       "budgeting": [
-        80.2,
         100.0,
         91.9,
         76.6,
         72.1,
         65.8,
         82.9,
-        79.3
+        79.3,
+        92.8
       ],
       "inflation": [
         100.0,
-        67.3,
-        53.7,
-        52.4,
-        37.6,
-        49.4,
-        59.5,
-        52.1
+        79.8,
+        77.8,
+        55.9,
+        73.3,
+        88.4,
+        77.3,
+        78.1
       ],
       "panic_buying": [
+        69.0,
+        87.9,
+        66.4,
+        43.1,
+        53.4,
+        80.2,
         100.0,
-        67.8,
-        86.4,
-        65.3,
-        42.4,
-        52.5,
-        78.8,
         98.3
       ],
       "panic_selling": [
         40.0,
-        40.0,
         20.0,
         20.0,
         20.0,
         20.0,
         100.0,
+        0.0,
         0.0
       ],
       "food_delivery": [
-        100.0,
-        96.6,
-        91.5,
-        78.6,
-        71.8,
-        74.4,
-        77.8,
-        76.9
+        89.7,
+        84.9,
+        73.0,
+        66.7,
+        69.0,
+        72.2,
+        71.4,
+        100.0
       ],
       "online_shopping": [
-        80.0,
         91.3,
         96.0,
         78.6,
         82.1,
         65.5,
         100.0,
-        96.3
+        96.3,
+        94.0
       ],
       "home_improvement": [
-        43.1,
         39.2,
         100.0,
         85.6,
         49.9,
         41.0,
         44.6,
-        43.9
+        43.9,
+        39.2
       ],
       "travel": [
-        97.4,
-        100.0,
-        92.3,
-        83.1,
-        77.9,
-        72.7,
-        85.6,
-        84.2
+        97.8,
+        90.3,
+        81.3,
+        76.2,
+        71.1,
+        83.7,
+        82.3,
+        100.0
       ],
       "mental_health": [
-        95.8,
         100.0,
         87.0,
         87.8,
         82.0,
         74.1,
         88.7,
-        79.9
+        79.9,
+        88.7
       ],
       "meditation": [
-        86.7,
         100.0,
         83.4,
         65.1,
         71.8,
         71.1,
         85.5,
-        87.8
+        87.8,
+        77.2
       ],
       "fitness": [
-        100.0,
-        84.2,
-        85.2,
-        86.9,
-        60.6,
-        70.9,
-        89.7,
-        87.4
+        63.7,
+        64.4,
+        65.7,
+        45.8,
+        53.6,
+        67.8,
+        66.1,
+        100.0
       ],
       "sleep": [
-        83.0,
         83.7,
         71.0,
         79.1,
         65.5,
         95.3,
         86.4,
-        100.0
+        100.0,
+        81.4
       ],
       "therapy": [
-        91.5,
         90.4,
         100.0,
         92.5,
         80.5,
         93.3,
         89.0,
-        95.7
+        95.7,
+        86.3
       ],
       "charity": [
-        86.4,
         87.0,
         89.9,
         88.8,
         55.6,
         80.5,
         100.0,
-        94.7
+        94.7,
+        95.3
       ],
       "volunteering": [
-        95.1,
         100.0,
         96.5,
         86.8,
         72.9,
         61.8,
         84.7,
-        91.7
+        91.7,
+        92.4
       ],
       "community": [
+        91.9,
+        98.3,
+        95.9,
+        83.7,
+        75.7,
+        96.6,
         100.0,
-        83.5,
-        89.3,
-        87.1,
-        76.0,
-        68.7,
-        87.8,
-        90.8
+        90.3
       ],
       "iftar_delivery": [
         100.0,
-        99.7,
-        90.5,
-        81.4,
-        73.0,
-        79.9,
-        77.6,
-        76.2
+        90.8,
+        81.6,
+        73.2,
+        80.1,
+        77.8,
+        76.4,
+        72.7
       ],
       "late_night": [
-        62.1,
         100.0,
         58.0,
         57.6,
         66.5,
         56.2,
         80.4,
-        70.5
+        70.5,
+        61.2
       ],
       "eid_shopping": [
-        68.1,
-        67.7,
-        67.8,
-        67.2,
-        59.1,
-        71.4,
-        100.0,
-        97.3
+        66.0,
+        66.0,
+        65.5,
+        57.6,
+        69.5,
+        97.4,
+        94.8,
+        100.0
       ],
       "suhoor": [
-        100.0,
         44.4,
         66.7,
         55.6,
         100.0,
         88.9,
         88.9,
-        100.0
+        100.0,
+        44.4
       ]
     },
     "rss_trends": {
       "UAE": {
-        "sport_entertainment_pct": 0,
-        "crisis_pct": 30,
+        "sport_entertainment_pct": 10,
+        "crisis_pct": 0,
         "top_topics": [
-          "difc",
-          "dubai airport iran war",
-          "dubai iran attack",
-          "mehidy hasan miraz",
-          "eid",
-          "icc",
-          "instagram down",
-          "chat gtp",
-          "uae iran war",
-          "drone"
+          "novak djokovic",
+          "weather",
+          "\u0627\u0644\u0637\u0642\u0633",
+          "\u092e\u094c\u0938\u092e",
+          "eid ul fitr 2026",
+          "ramadan 2026 uae",
+          "inter miami",
+          "concacaf champions cup",
+          "drone",
+          "\u062f\u0628\u064a \u0643\u0631\u064a\u0643 \u0647\u0627\u0631\u0628\u0648\u0631"
         ]
       },
       "KSA": {
-        "sport_entertainment_pct": 0,
-        "crisis_pct": 0,
-        "top_topics": [
-          "mehidy hasan miraz",
-          "\u0627\u062c\u0627\u0632\u0629 \u0639\u064a\u062f \u0627\u0644\u0641\u0637\u0631 2026",
-          "booking",
-          "air arabia",
-          "enhypen heeseung",
-          "icc",
-          "muhammad rizwan",
-          "dammam airport",
-          "saudi flag day",
-          "gulf air"
-        ]
-      },
-      "Kuwait": {
         "sport_entertainment_pct": 20,
         "crisis_pct": 10,
         "top_topics": [
-          "abdul samad",
-          "\u0627\u0644\u062c\u0632\u064a\u0631\u0629 \u0644\u0644\u0637\u064a\u0631\u0627\u0646",
-          "maaz sadaqat",
-          "pakistan vs bangladesh",
-          "jazeera airways",
+          "\u0627\u0644\u0634\u0631\u0648\u0642",
+          "\u0627\u0644\u0639\u064a\u062f",
+          "israel iran conflict",
+          "flamengo vs cruzeiro",
+          "benjamin netanyahu",
+          "\u062f\u0639\u0627\u0621 \u0627\u0644\u0639\u0634\u0631 \u0627\u0644\u0623\u0648\u0627\u062e\u0631 \u0627\u062f\u0639\u064a\u0647 \u0644\u064a\u0644\u0647 \u0627\u0644\u0642\u062f\u0631",
+          "concacaf champions cup",
+          "\u062d\u0631\u0628 \u0625\u064a\u0631\u0627\u0646",
+          "\u0645\u0646\u0635\u0629 \u0627\u062d\u0633\u0627\u0646",
+          "\u0644\u064a\u0644\u0647 \u0627\u0644\u0642\u062f\u0631"
+        ]
+      },
+      "Kuwait": {
+        "sport_entertainment_pct": 10,
+        "crisis_pct": 0,
+        "top_topics": [
           "weather",
           "\u0627\u0644\u0637\u0642\u0633",
-          "mirassol vs santos",
-          "\u062f\u0648\u0631\u064a \u0627\u0644\u0623\u0628\u0637\u0627\u0644",
-          "\u0627\u0628\u0633\u062a\u064a\u0646"
+          "psg",
+          "\u0645\u0628\u0627\u0631\u064a\u0627\u062a \u0627\u0644\u064a\u0648\u0645",
+          "\u0627\u062f\u0639\u064a\u0629 \u0644\u064a\u0644\u0629 \u0627\u0644\u0642\u062f\u0631",
+          "\u062f\u0639\u0627\u0621 \u0644\u064a\u0644\u0629 \u0627\u0644\u0642\u062f\u0631",
+          "\u0627\u0644\u0637\u0642\u0633 \u0641\u064a \u0627\u0644\u0643\u0648\u064a\u062a",
+          "enppi vs zamalek",
+          "kooora",
+          "real madrid"
         ]
       },
       "Qatar": {
-        "sport_entertainment_pct": 40,
-        "crisis_pct": 10,
+        "sport_entertainment_pct": 20,
+        "crisis_pct": 0,
         "top_topics": [
-          "nahid rana",
-          "abdul samad",
-          "icc",
-          "maaz sadaqat",
-          "bam adebayo",
-          "pakistan vs bangladesh",
-          "alexandra eala",
-          "mirassol vs santos",
-          "new zealand women vs zimbabwe women",
-          "barcelona vs newcastle"
+          "\u0627\u062f\u0639\u064a\u0629 \u0644\u064a\u0644\u0629 \u0627\u0644\u0642\u062f\u0631",
+          "\u062f\u0639\u0627\u0621 \u0644\u064a\u0644\u0629 \u0627\u0644\u0642\u062f\u0631",
+          "bod\u00f8/glimt vs sporting",
+          "psg",
+          "\u0645\u0628\u0627\u0631\u064a\u0627\u062a \u0627\u0644\u064a\u0648\u0645",
+          "\u0628\u064a \u0627\u0633 \u062c\u064a \u0636\u062f \u062a\u0634\u064a\u0644\u0633\u064a",
+          "real madrid",
+          "\u0625\u0646\u0628\u064a \u0636\u062f \u0627\u0644\u0632\u0645\u0627\u0644\u0643",
+          "psg vs chelsea",
+          "\u0627\u0644\u0631\u064a\u0627\u0644 \u0636\u062f \u0645\u0627\u0646 \u0633\u064a\u062a\u064a"
         ]
       }
     },
     "twitch": {
-      "total_viewers": 210523,
+      "total_viewers": 292286,
       "top_games": [
         {
-          "name": "Dota 2",
-          "viewers": 67411
+          "name": "Fall Guys",
+          "viewers": 63276
         },
         {
-          "name": "Street Fighter 6",
-          "viewers": 48194
-        },
-        {
-          "name": "League of Legends",
-          "viewers": 34442
+          "name": "ARC Raiders",
+          "viewers": 56091
         },
         {
           "name": "Just Chatting",
-          "viewers": 17590
+          "viewers": 49262
         },
         {
-          "name": "Super Mario 64",
-          "viewers": 13838
+          "name": "Grand Theft Auto V",
+          "viewers": 31980
+        },
+        {
+          "name": "Street Fighter 6",
+          "viewers": 25159
         }
       ]
     }
   },
   "news_volumes": {
     "guardian": {
-      "gaming": 19,
-      "streaming": 24,
+      "gaming": 18,
+      "streaming": 28,
       "humour": 53,
-      "beauty": 45,
-      "breaking_news": 491,
-      "crisis_topics": 282,
-      "war_news": 476,
-      "flight_searches": 47,
-      "fact_checking": 19,
-      "social_news": 241,
-      "price_comparison": 96,
+      "beauty": 35,
+      "breaking_news": 460,
+      "crisis_topics": 261,
+      "war_news": 450,
+      "flight_searches": 42,
+      "fact_checking": 18,
+      "social_news": 243,
+      "price_comparison": 102,
       "discounts": 35,
       "budgeting": 25,
-      "inflation": 92,
+      "inflation": 89,
       "panic_buying": 64,
-      "panic_selling": 86,
-      "food_delivery": 52,
-      "online_shopping": 50,
-      "home_improvement": 101,
-      "travel": 135,
-      "mental_health": 57,
+      "panic_selling": 81,
+      "food_delivery": 48,
+      "online_shopping": 42,
+      "home_improvement": 97,
+      "travel": 134,
+      "mental_health": 51,
       "meditation": 7,
-      "fitness": 24,
-      "sleep": 60,
-      "therapy": 37,
-      "charity": 44,
+      "fitness": 26,
+      "sleep": 50,
+      "therapy": 34,
+      "charity": 40,
       "volunteering": 3,
-      "community": 170,
-      "iftar_delivery": 18,
-      "late_night": 19,
+      "community": 165,
+      "iftar_delivery": 17,
+      "late_night": 17,
       "eid_shopping": 4,
-      "suhoor": 15
+      "suhoor": 14
     }
   },
   "sources_live": [
@@ -1857,9 +1857,5 @@
   "sources_failed": [
     "newsapi"
   ],
-  "ramadan_active": true,
-  "summaries": {
-    "Qatar": "As Ramadaan begins in Qatar on the 11th of March 2026, the following signals are prevalent across media and market:\n\n1. Escapism & Entertainment: Humour, Beauty, Streaming, News & Crisis Awareness, Economic Anxiety, Price Comparison, Inflation, Panic Sellings, Travel, Home Improvement, Food Delivery, Wellness & Mental Health, Social & Community, Charity, Volunteering, Sport 40%, Criisi 10%, Trenning (Nahid Rana, Abdul Samad, ICC, MAZAD Sadaqa), name top 2 signals\n\n2. Ramadaan: Name top 2 signals, Real-world correlation for Qatar, 11 March 2026\n3. Media Implication: One sharp action for a brand this week",
-    "UAE": "WPP Media MENA strategist | 11 March 2026 | Market: UAE | Ramadaan is active | Signals:\nEscapism & Entertainment: Humour, Beauty, Streaming (24%), News & Crisis Awareness (53%), Economic Anxiety (92%), Behavioral Shifts (101%), Wellness & Menatal Health (Sleep (60%, Mental Health (57%, Therapy (37%), Social & Community (Community (170%, Charity (44%, Volunteering (3%)\nRSs: Sport 0%, Criisis 30%, Trenching (Difc, Dubai airport Iran War, Dubai Iran attack, MEHIDY HAZAN MIRZA)\nParses | 120 words max | WPP Media MENA strategist, Ramadaan is active in UAE"
-  }
+  "ramadan_active": true
 }
