@@ -1,14 +1,14 @@
 {
-  "fetched_at": "2026-06-02T09:00:29.899379+00:00",
+  "fetched_at": "2026-06-03T09:20:31.319428+00:00",
   "dates": [
-    "May 26",
     "May 27",
     "May 28",
     "May 29",
     "May 30",
     "May 31",
     "Jun 01",
-    "Jun 02"
+    "Jun 02",
+    "Jun 03"
   ],
   "categories": {
     "escapism": {
@@ -1400,227 +1400,389 @@
   "global": {
     "wikipedia": {
       "gaming": [
+        95.0,
+        94.6,
+        98.3,
         100.0,
-        73.9,
-        73.5,
-        76.5,
-        77.7,
-        74.8,
-        69.0,
-        74.8
+        96.3,
+        88.8,
+        96.3,
+        96.7
       ],
       "streaming": [
-        72.7,
         87.1,
         98.2,
         94.5,
         100.0,
         80.0,
         82.2,
-        88.3
+        88.3,
+        81.8
       ],
       "humour": [
+        98.7,
+        99.8,
         100.0,
+        98.1,
+        74.6,
+        79.3,
         93.0,
-        94.1,
-        94.3,
-        92.5,
-        70.3,
-        74.8,
-        87.7
+        89.9
       ],
       "beauty": [
-        68.1,
         73.5,
         79.6,
         100.0,
         95.4,
         61.5,
         61.9,
-        78.8
+        78.8,
+        67.3
       ],
       "breaking_news": [
+        83.7,
         100.0,
-        69.4,
-        82.9,
-        63.8,
-        55.9,
-        56.8,
-        45.9,
-        49.4
+        77.0,
+        67.4,
+        68.4,
+        55.3,
+        59.6,
+        60.3
       ],
       "crisis_topics": [
-        75.3,
         92.8,
         99.0,
         84.5,
         99.0,
         69.1,
         60.8,
-        100.0
+        100.0,
+        89.7
       ],
       "war_news": [
-        94.6,
         96.7,
         100.0,
         99.6,
         98.7,
         77.8,
         75.3,
-        90.4
+        90.4,
+        94.8
       ],
       "flight_searches": [
-        86.4,
         78.9,
         77.4,
         78.1,
         100.0,
         76.1,
         67.1,
-        75.1
+        75.1,
+        83.5
       ],
       "fact_checking": [
-        79.1,
         60.7,
         67.0,
         84.5,
         100.0,
         39.8,
         46.6,
-        55.3
+        55.3,
+        53.4
       ],
       "social_news": [
-        77.8,
         91.7,
         85.8,
         100.0,
         98.3,
         59.0,
         62.4,
-        89.4
+        89.4,
+        92.2
       ]
     },
     "rss_trends": {
       "UAE": {
-        "sport_entertainment_pct": 10,
+        "sport_entertainment_pct": 0,
         "crisis_pct": 10,
         "top_topics": [
           "\u0d2e\u0d3f\u0d38\u0d48\u0d32\u0d4d",
-          "\u0633\u0646 \u0627\u0644\u0631\u0634\u062f",
-          "chatgpt",
-          "uae fuel price increase",
-          "public holiday",
-          "games",
-          "ai",
-          "\u062a\u0631\u062c\u0645\u0647",
-          "\u0d35\u0d3f\u0d2e\u0d3e\u0d28\u0d24\u0d4d\u0d24\u0d3e\u0d35\u0d33\u0d02",
-          "\u0d28\u0d4d\u0d2f\u0d42\u0d38\u0d4d"
+          "al jazeera live",
+          "kuwait",
+          "iran al jazeera",
+          "dawn",
+          "wordle",
+          "god of war laufey",
+          "united arab emirates",
+          "salary",
+          "charlie dean"
         ]
       },
       "KSA": {
-        "sport_entertainment_pct": 0,
-        "crisis_pct": 0,
+        "sport_entertainment_pct": 10,
+        "crisis_pct": 10,
         "top_topics": [
-          "claude ai",
-          "\u0645\u0634\u0627\u062c\u0631\u0629",
-          "\u0633\u0639\u0631 \u0627\u0644\u0631\u064a\u0627\u0644 \u0645\u0642\u0627\u0628\u0644 \u0627\u0644\u062c\u0646\u064a\u0647",
-          "\u0645\u0646\u0629 \u0634\u0644\u0628\u064a",
-          "\u0627\u0644\u0628\u0646\u0643 \u0627\u0644\u0645\u0631\u0643\u0632\u064a \u0627\u0644\u0633\u0639\u0648\u062f\u064a",
-          "\u0635\u0646\u062f\u0648\u0642 \u0627\u0644\u0627\u0633\u062a\u062b\u0645\u0627\u0631\u0627\u062a \u0627\u0644\u0639\u0627\u0645\u0629",
-          "\u0627\u0639\u062a\u0645\u0627\u062f",
-          "\u0635\u062d\u0629",
-          "\u0645\u0633\u0627\u0631",
-          "\u0646\u0648\u0631"
+          "singapore vs hong kong",
+          "\u0627\u0644\u0645\u0633\u062c\u062f \u0627\u0644\u0623\u0642\u0635\u0649",
+          "\u0627\u0644\u062d\u0631\u0633 \u0627\u0644\u0648\u0637\u0646\u064a",
+          "noor",
+          "god of war laufey",
+          "\u0645\u0635\u0631\u0641",
+          "dumfries",
+          "state of play",
+          "\u0633\u0627\u0639\u0627\u062a \u0627\u0644\u0639\u0645\u0644 \u0627\u0644\u0645\u0631\u0646\u0629",
+          "\u0641\u0636\u0627\u0621"
         ]
       },
       "Kuwait": {
         "sport_entertainment_pct": 0,
         "crisis_pct": 0,
         "top_topics": [
-          "\u0627\u0644\u0631\u0627\u064a",
-          "\u0637\u0631\u064a\u0642",
-          "chatgpt",
-          "\u0633\u0647\u0627\u0645 \u062c\u0644\u0627\u0644",
-          "\u0627\u0644\u0637\u0642\u0633",
-          "kuwait international airport"
+          "friendly fire",
+          "kuwait airport",
+          "\u0645\u0637\u0627\u0631 \u0627\u0644\u0643\u0648\u064a\u062a",
+          "liquid glass",
+          "kuwait times",
+          "kuwait",
+          "\u062f\u0648\u0645\u0641\u0631\u064a\u0633",
+          "\u0645\u0635\u0631\u0641",
+          "kick",
+          "\u0627\u0644\u0645\u063a\u0631\u0628 \u0636\u062f \u0645\u062f\u063a\u0634\u0642\u0631"
         ]
       },
       "Qatar": {
-        "sport_entertainment_pct": 0,
+        "sport_entertainment_pct": 40,
         "crisis_pct": 0,
         "top_topics": [
-          "\u0633\u0647\u0627\u0645 \u062c\u0644\u0627\u0644",
+          "us and iran news",
           "\u0627\u0644\u0637\u0642\u0633",
-          "facebook"
+          "\u062d\u0631\u0627\u0631\u0629",
+          "wales vs ghana",
+          "weather tomorrow",
+          "india vs england",
+          "morocco vs madagascar",
+          "maaz sadaqat",
+          "croatia vs belgium",
+          "\u0633\u0641\u064a\u0646\u0629"
         ]
       }
     },
     "twitch": {
-      "total_viewers": 137661,
+      "total_viewers": 171967,
       "top_games": [
         {
-          "name": "Splatoon 3",
-          "viewers": 32332
+          "name": "Just Chatting",
+          "viewers": 62152
         },
         {
-          "name": "League of Legends",
-          "viewers": 18820
+          "name": "Splatoon 3",
+          "viewers": 14969
+        },
+        {
+          "name": "DARK SOULS III",
+          "viewers": 14789
         },
         {
           "name": "Terraria",
-          "viewers": 17049
+          "viewers": 13592
         },
         {
-          "name": "Just Chatting",
-          "viewers": 11961
-        },
-        {
-          "name": "Special Events",
-          "viewers": 7451
+          "name": "League of Legends",
+          "viewers": 10485
         }
       ]
     }
   },
   "news_volumes": {
+    "newsapi": {
+      "UAE": {
+        "gaming": 42,
+        "streaming": 42,
+        "humour": 42,
+        "beauty": 42,
+        "breaking_news": 42,
+        "crisis_topics": 42,
+        "war_news": 42,
+        "flight_searches": 42,
+        "fact_checking": 42,
+        "social_news": 42,
+        "price_comparison": 42,
+        "discounts": 42,
+        "budgeting": 42,
+        "inflation": 42,
+        "panic_buying": 42,
+        "panic_selling": 42,
+        "food_delivery": 42,
+        "online_shopping": 42,
+        "home_improvement": 42,
+        "travel": 42,
+        "mental_health": 42,
+        "meditation": 42,
+        "fitness": 42,
+        "sleep": 42,
+        "therapy": 42,
+        "charity": 42,
+        "volunteering": 42,
+        "community": 42
+      },
+      "KSA": {
+        "gaming": 33,
+        "streaming": 33,
+        "humour": 33,
+        "beauty": 33,
+        "breaking_news": 33,
+        "crisis_topics": 33,
+        "war_news": 33,
+        "flight_searches": 33,
+        "fact_checking": 33,
+        "social_news": 33,
+        "price_comparison": 33,
+        "discounts": 33,
+        "budgeting": 33,
+        "inflation": 33,
+        "panic_buying": 33,
+        "panic_selling": 33,
+        "food_delivery": 33,
+        "online_shopping": 33,
+        "home_improvement": 33,
+        "travel": 33,
+        "mental_health": 33,
+        "meditation": 33,
+        "fitness": 33,
+        "sleep": 33,
+        "therapy": 33,
+        "charity": 33,
+        "volunteering": 33,
+        "community": 33
+      },
+      "Kuwait": {
+        "gaming": 12,
+        "streaming": 12,
+        "humour": 12,
+        "beauty": 12,
+        "breaking_news": 12,
+        "crisis_topics": 12,
+        "war_news": 12,
+        "flight_searches": 12,
+        "fact_checking": 12,
+        "social_news": 12,
+        "price_comparison": 12,
+        "discounts": 12,
+        "budgeting": 12,
+        "inflation": 12,
+        "panic_buying": 12,
+        "panic_selling": 12,
+        "food_delivery": 12,
+        "online_shopping": 12,
+        "home_improvement": 12,
+        "travel": 12,
+        "mental_health": 12,
+        "meditation": 12,
+        "fitness": 12,
+        "sleep": 12,
+        "therapy": 12,
+        "charity": 12,
+        "volunteering": 12,
+        "community": 12
+      },
+      "Qatar": {
+        "gaming": 28,
+        "streaming": 28,
+        "humour": 28,
+        "beauty": 28,
+        "breaking_news": 28,
+        "crisis_topics": 28,
+        "war_news": 28,
+        "flight_searches": 28,
+        "fact_checking": 28,
+        "social_news": 28,
+        "price_comparison": 28,
+        "discounts": 28,
+        "budgeting": 28,
+        "inflation": 28,
+        "panic_buying": 28,
+        "panic_selling": 28,
+        "food_delivery": 28,
+        "online_shopping": 28,
+        "home_improvement": 28,
+        "travel": 28,
+        "mental_health": 28,
+        "meditation": 28,
+        "fitness": 28,
+        "sleep": 28,
+        "therapy": 28,
+        "charity": 28,
+        "volunteering": 28,
+        "community": 28
+      }
+    },
+    "newsapi_global": {
+      "gaming": 115,
+      "streaming": 115,
+      "humour": 115,
+      "beauty": 115,
+      "breaking_news": 115,
+      "crisis_topics": 115,
+      "war_news": 115,
+      "flight_searches": 115,
+      "fact_checking": 115,
+      "social_news": 115,
+      "price_comparison": 115,
+      "discounts": 115,
+      "budgeting": 115,
+      "inflation": 115,
+      "panic_buying": 115,
+      "panic_selling": 115,
+      "food_delivery": 115,
+      "online_shopping": 115,
+      "home_improvement": 115,
+      "travel": 115,
+      "mental_health": 115,
+      "meditation": 115,
+      "fitness": 115,
+      "sleep": 115,
+      "therapy": 115,
+      "charity": 115,
+      "volunteering": 115,
+      "community": 115
+    },
     "guardian": {
-      "gaming": 20,
-      "streaming": 26,
-      "humour": 44,
+      "gaming": 17,
+      "streaming": 27,
+      "humour": 45,
       "beauty": 51,
-      "breaking_news": 366,
-      "crisis_topics": 198,
-      "war_news": 254,
-      "flight_searches": 16,
-      "fact_checking": 36,
-      "social_news": 258,
-      "price_comparison": 43,
-      "discounts": 48,
-      "budgeting": 30,
-      "inflation": 72,
-      "panic_buying": 34,
-      "panic_selling": 57,
-      "food_delivery": 54,
-      "online_shopping": 54,
-      "home_improvement": 86,
-      "travel": 119,
-      "mental_health": 87,
-      "meditation": 12,
-      "fitness": 28,
-      "sleep": 99,
-      "therapy": 32,
-      "charity": 64,
+      "breaking_news": 388,
+      "crisis_topics": 205,
+      "war_news": 271,
+      "flight_searches": 15,
+      "fact_checking": 33,
+      "social_news": 264,
+      "price_comparison": 45,
+      "discounts": 42,
+      "budgeting": 36,
+      "inflation": 67,
+      "panic_buying": 35,
+      "panic_selling": 60,
+      "food_delivery": 49,
+      "online_shopping": 55,
+      "home_improvement": 82,
+      "travel": 118,
+      "mental_health": 81,
+      "meditation": 10,
+      "fitness": 27,
+      "sleep": 95,
+      "therapy": 34,
+      "charity": 59,
       "volunteering": 5,
-      "community": 210
+      "community": 222
     }
   },
   "sources_live": [
     "wikipedia",
     "google_rss",
+    "newsapi",
     "guardian",
     "twitch"
   ],
-  "sources_failed": [
-    "newsapi"
-  ],
+  "sources_failed": [],
   "ramadan_active": true
 }
